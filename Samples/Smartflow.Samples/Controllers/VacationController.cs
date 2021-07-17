@@ -39,6 +39,13 @@ namespace Smartflow.Samples.Controllers
             });
         }
 
+
+        [Route("api/order/persistent"), HttpPost]
+        public void PostTestAsync(PasswordDto dto)
+        {
+          
+        }
+
         [Route("api/vacation/{id}/info"), HttpGet]
         public VacationDto Get(string id)
         {

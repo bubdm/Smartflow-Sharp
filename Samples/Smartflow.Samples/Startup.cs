@@ -56,6 +56,14 @@ namespace Smartflow.Samples
           
             app.UseStaticFiles();
 
+            app.UseCors((cors) =>
+            {
+                cors.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+            });
+
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
