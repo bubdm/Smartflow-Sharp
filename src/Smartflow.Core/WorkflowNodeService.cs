@@ -70,7 +70,7 @@ namespace Smartflow.Core
             XAttribute url = element.Attribute("url");
             XAttribute attr = element.Attribute("veto");
 
-            node.Veto = attr == null ? String.Empty : "Smartflow.Core.Components.VetoService";
+            node.Veto = attr != null && attr.Value == "0" ? String.Empty : "Smartflow.Core.Components.VetoService";
             node.Back = back == null ? String.Empty : back.Value;
             node.Url = url == null ? String.Empty : url.Value;
 
@@ -100,7 +100,7 @@ namespace Smartflow.Core
 
                 if (node.Command != null)
                 {
-                    node.Command.Node= node;
+                    node.Command.Node = node;
                 }
             }
             return node;
@@ -168,7 +168,7 @@ namespace Smartflow.Core
                 }
                 Transition instance = null;
 
-                List<Transition> transitions =n.Transitions.ToList();
+                List<Transition> transitions = n.Transitions.ToList();
 
                 if (resultSet.Rows.Count > 0)
                 {
