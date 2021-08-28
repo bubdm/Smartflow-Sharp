@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using AutoMapper;
 using log4net;
@@ -10,12 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NHibernate.NetCore;
-using Smartflow.Bussiness.Interfaces;
-using Smartflow.Bussiness.Models;
-using Smartflow.Bussiness.Queries;
-using Smartflow.Bussiness.WorkflowService;
 using Smartflow.Common;
-using Smartflow.Core;
 using Smartflow.API.Code;
 using Smartflow.API.Profile;
 
@@ -48,23 +42,9 @@ namespace Smartflow.API
                 // 如字段为null值，该字段不会返回到前端
                 // options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore; 
             });
-           
-            services.AddTransient<ISummaryService, SummaryService>();
-            services.AddTransient<IBridgeService, BridgeService>();
-            services.AddTransient<IQuery<IList<Category>>, CategoryService>();
-            services.AddTransient<IPendingService, PendingService>();
-            services.AddTransient<IRecordService, RecordService>();
-            services.AddTransient<IQuery<IList<Constraint>>, ConstraintService>();
-            services.AddTransient<AbstractBridgeService, BaseBridgeService>();
-            services.AddTransient<IOrganizationService, OrganizationService>();
-            services.AddTransient<IActorService, ActorService>();
-            services.AddTransient<IWorkflowStructureService, WorkflowStructureService>();
 
-            WorkflowGlobalServiceProvider.RegisterGlobalService(typeof(PendingAction));
-            WorkflowGlobalServiceProvider.RegisterGlobalService(typeof(RecordAction));
-            WorkflowGlobalServiceProvider.RegisterGlobalService(typeof(CarbonCopyAction));
-            WorkflowGlobalServiceProvider.RegisterPartService(new EmptyAction());
-
+            Ioc.RegisterService(services);
+            WorkflowGlobalService.RegisterService();
             services.AddAutoMapper((mapper) => mapper.AddProfile(typeof(SmartflowProfile)));
             XmlConfigurator.Configure(LogManager.CreateRepository(GlobalObjectService.Configuration.GetSection("Logging:Program").Value), new FileInfo("log4net.config"));
             services.AddHibernate(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"hibernate.cfg.xml"));
