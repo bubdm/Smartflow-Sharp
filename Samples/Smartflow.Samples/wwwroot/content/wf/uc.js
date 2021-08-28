@@ -189,7 +189,7 @@ $(function () {
         });
         util.ajaxWFService({
             url: 'api/setting/pending/delete',
-            type: 'delete',
+            type: 'post',
             dataType:'text',
             data: JSON.stringify({
                 ID: id,

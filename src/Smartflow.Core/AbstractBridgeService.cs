@@ -34,15 +34,6 @@ namespace Smartflow.Core
             }
         }
 
-        public WorkflowStructureService WorkflowStructureService
-        {
-            get
-            {
-                return WorkflowGlobalServiceProvider.Resolve<WorkflowStructureService>();
-            }
-        }
-
-
         /// <summary>
         /// 获取参与组
         /// </summary>

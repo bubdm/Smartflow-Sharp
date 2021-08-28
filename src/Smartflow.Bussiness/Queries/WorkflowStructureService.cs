@@ -9,33 +9,19 @@ using System.Collections.Generic;
 using System.Linq;
 using NHibernate;
 using NHibernate.Criterion;
+using Smartflow.Bussiness.Interfaces;
+using Smartflow.Bussiness.Models;
 using Smartflow.Common;
 
-namespace Smartflow.Core
+namespace Smartflow.Bussiness.Queries
 {
-    public class WorkflowStructureService : IWorkflowPersistent<WorkflowStructure>,  IWorkflowQuery<IList<WorkflowStructure>>
+    public class WorkflowStructureService : IWorkflowStructureService
     {
-        public void Persistent(WorkflowStructure entry)
-        {
-            using ISession session = DbFactory.OpenSession();
-            session.SaveOrUpdate(entry);
-            session.Flush();
-        }
-
-        public void Delete(string id)
-        {
-            using ISession session = DbFactory.OpenSession();
-            var model = session.Get<WorkflowStructure>(id);
-            session.Delete(model);
-            session.Flush();
-        }
-
-        public WorkflowStructure Get(string id)
+        public WorkflowStructure GetStructureByID(string id)
         {
             using ISession session = DbFactory.OpenSession();
             return session.Get<WorkflowStructure>(id);
         }
-
 
         public IList<WorkflowStructure> Query()
         {

@@ -44,7 +44,7 @@ $(function () {
 
         util.ajaxWFService({
             url: url,
-            type: 'delete',
+            type: 'post',
             dataType:'text',
             success: function () {
                 layui.table.reload(config.task);

@@ -26,7 +26,6 @@ namespace Smartflow.Core
             _globalTypeCollection.Add(typeof(WorkflowInstanceService));
             _globalTypeCollection.Add(typeof(DefaultActionService));
             _globalTypeCollection.Add(typeof(ScriptActionService));
-            _globalTypeCollection.Add(typeof(WorkflowStructureService));
             _globalTypeCollection.Add(typeof(WorkflowCooperationService));
             _globalTypeCollection.Add(typeof(WorkflowTransitionService));
             _globalTypeCollection.Add(typeof(WorkflowLinkService));

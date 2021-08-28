@@ -344,6 +344,7 @@
 
                 formData.Resource = instance.export();
                 util.ajaxWFService({
+                    dataType:'text',
                     url: $this.option.save,
                     data: JSON.stringify(formData),
                     success: function () {

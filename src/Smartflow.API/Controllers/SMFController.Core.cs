@@ -28,6 +28,7 @@ namespace Smartflow.API.Controllers
         private readonly IPendingService _pendingService;
         private readonly IBridgeService _bridgeService;
         private readonly IActorService _actorService;
+        private readonly IWorkflowStructureService _workflowStructureService;
         private readonly IMapper _mapper;
         protected IWorkflowNodeService NodeService
         {
@@ -36,12 +37,13 @@ namespace Smartflow.API.Controllers
                 return WorkflowGlobalServiceProvider.Resolve<AbstractWorkflow>().NodeService;
             }
         }
-        public SMFController(AbstractBridgeService abstractService, IPendingService pendingService, IBridgeService bridgeService, IActorService actorService, IMapper mapper)
+        public SMFController(AbstractBridgeService abstractService, IWorkflowStructureService workflowStructureService, IPendingService pendingService, IBridgeService bridgeService, IActorService actorService, IMapper mapper)
         {
             _abstractService = abstractService;
             _pendingService = pendingService;
             _bridgeService = bridgeService;
             _actorService = actorService;
+            _workflowStructureService = workflowStructureService;
             _mapper = mapper;
         }
 
@@ -53,7 +55,7 @@ namespace Smartflow.API.Controllers
         {
             Category category = new CategoryService().Query().FirstOrDefault(cate => cate.NID == dto.CategoryCode);
             WorkflowStructure workflowStructure =
-                _abstractService.WorkflowStructureService.Query().FirstOrDefault(e => e.CategoryCode == category.NID && e.Status == 1);
+                _workflowStructureService.Query().FirstOrDefault(e => e.CategoryCode == category.NID && e.Status == 1);
             string instanceID = WorkflowEngine.Instance.Start(workflowStructure.Resource);
 
             Bridge model = _mapper.Map<Bridge>(dto);

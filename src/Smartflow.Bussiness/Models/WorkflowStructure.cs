@@ -6,7 +6,7 @@
  */
 using System;
 
-namespace Smartflow.Core
+namespace Smartflow.Bussiness.Models
 {
     public class WorkflowStructure
     {

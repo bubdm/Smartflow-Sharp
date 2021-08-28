@@ -116,6 +116,22 @@
 		<property name="CreateTime" column="CreateTime" type="DateTime" />
 	</class>
 
+	<class name="WorkflowStructure" table="t_structure">
+		<id name="NID" column="NID" type="String">
+			<generator class="uuid.hex">
+				<param name="format"></param>
+				<param name="separator"></param>
+			</generator>
+		</id>
+		<property name="Name" column="Name" type="String" />
+		<property name="CategoryCode" column="CategoryCode" type="String"  />
+		<property name="CategoryName" column="CategoryName" type="String"  />
+		<property name="Resource" column="Resource" type="String"  />
+		<property name="Status" column="Status" type="Int32"  />
+		<property name="CreateTime" column="CreateTime" type="DateTime"  />
+		<property name="Memo" column="Memo" type="String"  />
+	</class>
+
 	<sql-query name="queryAssistantByInstance">
 		insert into t_assistant(NID,InstanceID,NodeID,Total) select NEWID(),InstanceID,NodeID,[dbo].[GetAssistant](InstanceID,NodeID) from (SELECT InstanceID,NodeID from t_pending where NodeID not in (select NodeID from t_assistant where [InstanceID]=:InstanceID)  and InstanceID=:InstanceID group by InstanceID,NodeID) T
 	</sql-query>

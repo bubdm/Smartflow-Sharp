@@ -58,6 +58,7 @@ namespace Smartflow.API
             services.AddTransient<AbstractBridgeService, BaseBridgeService>();
             services.AddTransient<IOrganizationService, OrganizationService>();
             services.AddTransient<IActorService, ActorService>();
+            services.AddTransient<IWorkflowStructureService, WorkflowStructureService>();
 
             WorkflowGlobalServiceProvider.RegisterGlobalService(typeof(PendingAction));
             WorkflowGlobalServiceProvider.RegisterGlobalService(typeof(RecordAction));

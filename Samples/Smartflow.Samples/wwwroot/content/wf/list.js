@@ -49,7 +49,7 @@ $(function () {
             var useState = (obj.elem.checked ? 1 : 0);
             var url = util.format("api/setting/structure/{id}/update/{status}", { id: id, status: useState });
             util.ajaxWFService({
-                type: 'put',
+                type: 'post',
                 url: url,
                 dataType:'text',
                 success: function () {
@@ -120,7 +120,8 @@ $(function () {
         var url = util.format(this.setting.config.delete, { id: id});
         util.ajaxWFService({
             url: url,
-            type: 'delete',
+            dataType: 'text',
+            type: 'post',
             success: function () {
                 layer.closeAll();
                 $this.refresh();

@@ -39,9 +39,10 @@ namespace Smartflow.API.Controllers
         private readonly IBridgeService _bridgeService;
         private readonly IRecordService _recordService;
         private readonly ISummaryService _summaryService;
+        private readonly IWorkflowStructureService _workflowStructureService;
 
         private readonly IMapper _mapper;
-        public SettingController(AbstractBridgeService abstractService, ISummaryService summaryService, IRecordService recordService, IQuery<IList<Constraint>> constraintService, IOrganizationService organizationService, IActorService actorService, IQuery<IList<Category>> categoryService, IBridgeService bridgeService, IMapper mapper)
+        public SettingController(AbstractBridgeService abstractService, IWorkflowStructureService workflowStructureService, ISummaryService summaryService, IRecordService recordService, IQuery<IList<Constraint>> constraintService, IOrganizationService organizationService, IActorService actorService, IQuery<IList<Category>> categoryService, IBridgeService bridgeService, IMapper mapper)
         {
             _abstractService = abstractService;
             _constraintService = constraintService;
@@ -51,6 +52,7 @@ namespace Smartflow.API.Controllers
             _bridgeService = bridgeService;
             _recordService = recordService;
             _summaryService = summaryService;
+            _workflowStructureService = workflowStructureService;
             _mapper = mapper;
         }
 
@@ -179,7 +181,7 @@ namespace Smartflow.API.Controllers
             return _mapper.Map<IList<Record>, IList<RecordDto>>(_recordService.GetRecordByInstanceID(instanceID));
         }
 
-        [Route("api/setting/pending/delete"), HttpDelete]
+        [Route("api/setting/pending/delete"), HttpPost]
         public void Delete(PendingDeleteBody dto)
         {
             string[] ids = dto.ActorIDs.Split(',');
@@ -237,7 +239,7 @@ namespace Smartflow.API.Controllers
             return CommonMethods.Response(_mapper.Map<List<Supervise>, List<SummaryDto>>(list), total);
         }
 
-        [Route("api/setting/summary/{instanceID}/{categoryCode}/delete/{id}"), HttpDelete]
+        [Route("api/setting/summary/{instanceID}/{categoryCode}/delete/{id}"), HttpPost]
         public void Delete(string instanceID, string categoryCode, string id)
         {
             CommandBus.Dispatch(new DeleteAllRecord(), new Script
@@ -252,34 +254,33 @@ namespace Smartflow.API.Controllers
         public dynamic Query(Paging paging)
         {
             IList<WorkflowStructure> structs =
-                _abstractService.WorkflowStructureService.Query(paging.Page, paging.Limit, out int total, paging.Get());
+                _workflowStructureService.Query(paging.Page, paging.Limit, out int total, paging.Get());
             return CommonMethods.Response(_mapper.Map<IList<WorkflowStructure>, IList<WorkflowStructureDto>>(structs), total);
         }
 
         [Route("api/setting/structure/{id}/info"), HttpGet]
         public WorkflowStructureDto GetWorkflowStructureByID(string id)
         {
-            return _mapper.Map<WorkflowStructure, WorkflowStructureDto>(_abstractService.WorkflowStructureService.Get(id));
+            return _mapper.Map<WorkflowStructure, WorkflowStructureDto>(_workflowStructureService.GetStructureByID(id));
         }
 
-        [Route("api/setting/structure/{id}/update/{status}"), HttpPut]
+        [Route("api/setting/structure/{id}/update/{status}"), HttpPost]
         public void Update(string id, int status)
         {
-            WorkflowStructure model = _abstractService.WorkflowStructureService.Get(id);
+            WorkflowStructure model = _workflowStructureService.GetStructureByID(id);
             model.Status = status;
             if (model.Status == 1)
             {
-                IList<WorkflowStructure> wfList = _abstractService
-                    .WorkflowStructureService.Query().Where(e => e.CategoryCode == model.CategoryCode && e.NID != model.NID && e.Status == 1)
+                IList<WorkflowStructure> wfList = _workflowStructureService.Query().Where(e => e.CategoryCode == model.CategoryCode && e.NID != model.NID && e.Status == 1)
                     .ToList<WorkflowStructure>();
 
                 foreach (WorkflowStructure entry in wfList)
                 {
                     entry.Status = 0;
-                    _abstractService.WorkflowStructureService.Persistent(entry);
+                    CommandBus.Dispatch(new CreateWorkflowStructure(), entry);
                 }
             }
-            _abstractService.WorkflowStructureService.Persistent(model);
+            CommandBus.Dispatch(new CreateWorkflowStructure(), model);
         }
 
         [Route("api/setting/structure/persistent"), HttpPost]
@@ -290,7 +291,7 @@ namespace Smartflow.API.Controllers
             structure.CreateTime = DateTime.Now;
             if (!String.IsNullOrEmpty(commandDto.NID))
             {
-                WorkflowStructure model = _abstractService.WorkflowStructureService.Get(structure.NID);
+                WorkflowStructure model = _workflowStructureService.GetStructureByID(structure.NID);
                 if (model != null)
                 {
                     if (structure.CategoryCode != model.CategoryCode)
@@ -299,13 +300,13 @@ namespace Smartflow.API.Controllers
                     }
                 }
             }
-            _abstractService.WorkflowStructureService.Persistent(structure);
+            CommandBus.Dispatch(new CreateWorkflowStructure(), structure);
         }
 
-        [Route("api/setting/structure/{id}/delete"), HttpDelete]
+        [Route("api/setting/structure/{id}/delete"), HttpPost]
         public void Delete(string id)
         {
-            _abstractService.WorkflowStructureService.Delete(id);
+            CommandBus.Dispatch(new DeleteWorkflowStructure(), id);
         }
     }
 }

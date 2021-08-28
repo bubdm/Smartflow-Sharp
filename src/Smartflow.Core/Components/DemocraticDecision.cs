@@ -21,7 +21,6 @@ namespace Smartflow.Core.Components
                 selectDestinations.Add(entry.TransitionID);
             }
 
-
             var data = from d in selectDestinations
                        group d by d into g
                        orderby g.Count() descending
