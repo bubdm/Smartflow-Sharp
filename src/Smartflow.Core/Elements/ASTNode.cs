@@ -16,9 +16,7 @@ namespace Smartflow.Core.Elements
         protected ISet<Transition> transitions = new HashSet<Transition>();
         protected WorkflowNodeCategory category = WorkflowNodeCategory.Node;
         protected ISet<Action> actions = new HashSet<Action>();
-        private string cooperation = string.Empty;
-        private string assistant = string.Empty;
-
+    
         public virtual ISet<Action> Actions
         {
             get { return actions; }
@@ -36,24 +34,5 @@ namespace Smartflow.Core.Elements
             get { return category; }
             set { category = value; }
         }
-
-        /// <summary>
-        /// 流转策略 
-        /// </summary>
-        public virtual string Cooperation
-        {
-            get { return cooperation; }
-            set { cooperation = value; }
-        }
-
-        /// <summary>
-        /// 协办策略
-        /// </summary>
-        public virtual string Assistant
-        {
-            get { return assistant; }
-            set { assistant = value; }
-        }
-
     }
 }

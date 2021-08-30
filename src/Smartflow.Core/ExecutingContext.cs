@@ -51,25 +51,26 @@ namespace Smartflow.Core
             set;
         }
 
-        /// <summary>
-        /// 工作流实例
-        /// </summary>
-        public WorkflowInstance Instance
+        public string InstanceID
         {
             get;
             set;
         }
+
+
+        ///// <summary>
+        ///// 工作流实例
+        ///// </summary>
+        //public WorkflowInstance Instance
+        //{
+        //    get;
+        //    set;
+        //}
 
         /// <summary>
         /// 传递数据
         /// </summary>
         public dynamic Data
-        {
-            get;
-            set;
-        }
-
-        public bool Result
         {
             get;
             set;

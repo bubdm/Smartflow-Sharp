@@ -51,19 +51,12 @@ namespace Smartflow.Core
             get { return WorkflowGlobalServiceProvider.Resolve<IWorkflowProcessService>(); }
         }
 
-        public IWorkflowCooperationService WorkflowCooperationService
-        {
-            get { return WorkflowGlobalServiceProvider.Resolve<IWorkflowCooperationService>(); }
-        }
-
         public Element Parse(XElement element)
         {
             Node node = new Node
             {
                 Name = element.Attribute("name").Value,
-                ID = element.Attribute("id").Value,
-                Cooperation = element.Attribute("cooperation").Value,
-                Assistant = element.Attribute("assistant").Value
+                ID = element.Attribute("id").Value
             };
 
             XAttribute back = element.Attribute("back");
@@ -216,13 +209,17 @@ namespace Smartflow.Core
         {
             List<Transition> transitions = new List<Transition>();
             transitions.AddRange(entry.Transitions);
-            if (entry.NodeType != WorkflowNodeCategory.Start && !String.IsNullOrWhiteSpace(entry.Veto))
+            if (entry.NodeType != WorkflowNodeCategory.Start && !String.IsNullOrWhiteSpace(entry.Veto)&&"0"!=entry.Veto)
             {
                 transitions.Add(Internals.Utils.CONST_REJECT_TRANSITION);
             }
-            if (entry.NodeType != WorkflowNodeCategory.Start && !String.IsNullOrWhiteSpace(entry.Back))
+            if (entry.NodeType != WorkflowNodeCategory.Start && !String.IsNullOrWhiteSpace(entry.Back) && "Smartflow.Core.Components.BackService" == entry.Back)
             {
                 transitions.Add(Internals.Utils.CONST_BACK_TRANSITION);
+            }
+            if (entry.NodeType != WorkflowNodeCategory.Start && !String.IsNullOrWhiteSpace(entry.Back) && "Smartflow.Core.Components.BackSenderService" == entry.Back)
+            {
+                transitions.Add(Internals.Utils.CONST_BACKSENDER_TRANSITION);
             }
             return transitions;
         }
@@ -246,17 +243,25 @@ namespace Smartflow.Core
         /// 上一个执行跳转节点
         /// </summary>
         /// <returns></returns>
-        public Node GetPrevious(Node entry)
+        public Node GetPrevious(Transition transition)
         {
-            Transition transition = GetHistoryTransition(entry);
-            if (transition == null) return null;
-
             using ISession session = DbFactory.OpenSession();
             Node node = session.Query<Node>()
-                .Where(e => e.InstanceID == entry.InstanceID && e.ID == transition.Origin)
+                .Where(e => e.InstanceID == transition.InstanceID && e.ID == transition.Origin)
                 .ToList().FirstOrDefault();
             return node;
         }
+
+        /// <summary>
+        /// 获取退回路线
+        /// </summary>
+        /// <param name="entry"></param>
+        /// <returns></returns>
+        public Transition GetPreviousTransition(Node entry)
+        {
+           return this.GetHistoryTransition(entry);
+        }
+
 
         /// <summary>
         /// 获取回退线路

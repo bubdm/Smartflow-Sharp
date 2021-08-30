@@ -1,4 +1,4 @@
-﻿; (function () {
+﻿(function (factory) {
 
     function Audit(option) {
         this.user = util.getUser();
@@ -20,7 +20,7 @@
     Audit.prototype.openAuditWindow = function () {
         var $this = this,
             setting = $this.setting,
-            url = util.format($this.setting.url, {instanceID: setting.instanceID,actorID: $this.user.ID});
+            url = util.format($this.setting.url, { instanceID: setting.instanceID, actorID: $this.user.ID });
         util.ajaxWFService({
             type: 'get',
             url: url,
@@ -43,7 +43,7 @@
     Audit.prototype.setCurrent = function () {
         var $this = this,
             setting = $this.setting,
-            url = util.format($this.setting.url, {instanceID: setting.instanceID,actorID: $this.user.ID});
+            url = util.format($this.setting.url, { instanceID: setting.instanceID, actorID: $this.user.ID });
         util.ajaxWFService({
             type: 'get',
             url: url,
@@ -85,13 +85,15 @@
 
         $(setting.image).click(function () {
             var url = util.process + setting.instanceID;
-            util.openWin(url, '流程图', window.screen.availWidth-100, window.screen.availHeight-160);
+            util.openWin(url, '流程图', window.screen.availWidth - 100, window.screen.availHeight - 160);
         });
     }
 
-    $.Audit = function (option) {
+    factory(function (option) {
         return new Audit(option);
-    };
+    });
 
-})();
+})(function (instance) {
+    $.Audit = instance;
+});
 

@@ -29,5 +29,10 @@ namespace Smartflow.Core
             get;
             set;
         }
+
+        public virtual DateTime CreateTime
+        {
+            get;set;
+        }
     }
 }

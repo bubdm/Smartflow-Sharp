@@ -3,9 +3,9 @@
  Home page: http://www.smartflow-sharp.com
  ********************************************************************
  */
-; (function () {
+(function (factory) {
 
-    window.setting = {
+    factory({
         load: function (nx) {
             $('iframe').each(function () {
                 $(this).context.contentWindow.setting.load(nx);
@@ -16,6 +16,8 @@
                 $(this).context.contentWindow.setting.set(nx);
             })
         }
-    };
+    });
 
-})();
+})(function (option) {
+    window.setting = option;
+});

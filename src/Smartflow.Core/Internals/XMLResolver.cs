@@ -15,10 +15,9 @@ using Smartflow.Core.Elements;
 
 namespace Smartflow.Core.Internals
 {
-    internal class ManualResolution : IResolution
+    internal class XMLResolver
     {
-
-        public Workflow Parse(string resourceXml)
+        public static Workflow Parse(string resourceXml)
         {
             Workflow instance = new Workflow();
             XDocument doc = XDocument.Parse(resourceXml);

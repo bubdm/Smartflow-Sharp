@@ -3,7 +3,7 @@
  Home page: http://www.smartflow-sharp.com
  ********************************************************************
  */
-;(function () {
+; (function (factory) {
 
     function loadGroup(nx) {
         var ajaxSettings = { url: 'api/setting/group/list', type: 'get' };
@@ -21,7 +21,7 @@
                     checked: ''
                 });
             });
-            
+
             $.each(nx.group, function () {
                 rightDataSource.push(this.id);
             });
@@ -61,11 +61,11 @@
         nx.group = roleArray;
     }
 
-
-
-    window.setting = {
+    factory({
         load: loadGroup,
         set: setGroup
-    };
+    });
 
-})();
+})(function (option) {
+    window.setting = option;
+});

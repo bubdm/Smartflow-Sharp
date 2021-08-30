@@ -16,34 +16,14 @@
                 $('#node_veto').prop('checked', veto === 1);
             }
         },
-        node_cooperation_select: {
-            type: 'select',
-            parse: function (id) {
-                return $.SMF.getNodeById(id);
-            },
-            invoke: function (nx) {
-                $("#node_cooperation_select").val(nx.cooperation);
-                layui.form.render('select', 'form_cooperation');
-            }
-        },
-        node_assistant_select: {
-            type: 'select',
-            parse: function (id) {
-                return $.SMF.getNodeById(id);
-            },
-            invoke: function (nx) {
-                $("#node_assistant_select").val(nx.assistant);
-                layui.form.render('select', 'form_cooperation');
-            }
-        },
         node_back_select: {
             type: 'select',
             parse: function (id) {
                 return $.SMF.getNodeById(id);
             },
             invoke: function (nx) {
-                $("#node_back_select").val(nx.back);
-                layui.form.render('select', 'form_node');
+                //$("#node_back_select").val(nx.back);
+                layui.form.val('form_node',{ node_back_select: nx.back });
             }
         },
         node_action: {
@@ -203,28 +183,10 @@
                     Configuration.open(result.element, result.descriptor);
                 });
             }
-            else if (propertyName == 'node_cooperation_select') {
-                layui.form.on('select(node_cooperation_select)', function (data) {
-                    if (data.value) {
-                        var result = Configuration.findElementById.call($this, $("#node_cooperation_select"));
-                        result.element.cooperation = (!!data.value) ? data.value : '';
-                    }
-                });
-            }
-            else if (propertyName == 'node_assistant_select') {
-                layui.form.on('select(node_assistant_select)', function (data) {
-                    if (data.value) {
-                        var result = Configuration.findElementById.call($this, $("#node_assistant_select"));
-                        result.element.assistant= (!!data.value) ? data.value : '';
-                    }
-                });
-            }
             else if (propertyName == 'node_back_select') {
                 layui.form.on('select(node_back_select)', function (data) {
-                    if (data.value) {
-                        var result = Configuration.findElementById.call($this, $("#node_back_select"));
-                        result.element.back = data.value;
-                    }
+                    var result = Configuration.findElementById.call($this, $("#node_back_select"));
+                    result.element.back = data.value;
                 });
             }
             else {
@@ -250,7 +212,7 @@
                 $.each(nx.rule, function () { $('#' + this.id).attr("checked", true); });
                 layui.form.render(null, $this.option.constraintID);
             });
-            var controls = ['node_veto', 'node_name', 'node_carbon', 'node_cooperation_select','node_assistant_select', 'node_back_select'];
+            var controls = ['node_veto', 'node_name', 'node_carbon','node_back_select'];
             $.each(controls, function (i, propertyName) {
                 if (Configuration.controlSelectors[propertyName].invoke) {
                     Configuration.controlSelectors[propertyName].invoke(nx, $this);

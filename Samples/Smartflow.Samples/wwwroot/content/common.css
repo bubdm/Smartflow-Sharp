@@ -23,7 +23,6 @@ html,body{overflow:hidden;}
 .aj {text-align: justify;text-justify:inter-ideograph;}
 .hide {display:none}
 textarea {resize: none !important;}
-
 .layui-smf-box {
     padding: 5px;
     position:absolute;
@@ -64,3 +63,4 @@ textarea {resize: none !important;}
 .flow-audit-info {border-top: #eee 1px solid;height: 40px;position: absolute;bottom: 0;left: 0;right: 0;z-index: 9999;padding-left: 15px;line-height: 40px;}
 .flow-audit-info span, .flow-audit-info span {width: 33.3333333%;display: inline-block;text-align: center;}
 .flow-audit-info span:first-child {text-align: left;}
+.flow-sign {text-align: right;padding-right: 20px;font-weight: 600;}

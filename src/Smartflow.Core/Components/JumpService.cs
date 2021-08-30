@@ -7,50 +7,63 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-
 using Smartflow.Core.Elements;
-using Smartflow.Core.Internals;
 
 namespace Smartflow.Core.Components
 {
-    public class JumpService : IJump
+    public class JumpService
     {
         private readonly AbstractWorkflow workflowService = WorkflowGlobalServiceProvider.Resolve<AbstractWorkflow>();
 
-        public void Jump(WorkflowContext context)
+        public void Next(WorkflowJumpContext context)
         {
-            string instanceID = context.Instance.InstanceID;
-            Node current = context.Current;
-            Transition currentTransition = WorkflowGlobalServiceProvider.Resolve<IWorkflowTransitionService>().GetTransition(context.TransitionID);
-            IList<Node> nodes = workflowService.NodeService.Query(instanceID);
-            Node to = nodes.FirstOrDefault(e => e.ID == currentTransition.Destination);
-            this.Invoke(to, currentTransition, new ExecutingContext
+            WorkflowInstance instance = WorkflowInstance.GetInstance(context.InstanceID);
+            Node current = instance.Current.FirstOrDefault(e => e.NID == context.NodeID);
+
+            Transition transition = current.Transitions.FirstOrDefault();
+            IList<Node> nodes = workflowService.NodeService.Query(instance.InstanceID);
+            Node to = nodes.FirstOrDefault(e => e.ID == transition.Destination);
+            this.Invoke(transition, new ExecutingContext
             {
                 From = current,
                 To = to,
                 Direction = WorkflowOpertaion.Go,
-                Instance = context.Instance,
+                InstanceID= instance.InstanceID,
                 Data = context.Data,
-                Message = context.Message,
-                Result = context.Result
+                Message = context.Message
             }, context);
         }
 
-        private void Invoke(Node to, Transition selectTransition, ExecutingContext executeContext, WorkflowContext context)
+        private void Next(WorkflowJumpContext context, Transition transition)
         {
-            string instanceID = context.Instance.InstanceID;
-            string actorID = context.ActorID;
-            workflowService.InstanceService.Jump(selectTransition.Origin,selectTransition.Destination, instanceID, new WorkflowProcess()
+            WorkflowInstance instance = WorkflowInstance.GetInstance(context.InstanceID);
+            IList<Node> nodes = workflowService.NodeService.Query(instance.InstanceID);
+            Node current = nodes.FirstOrDefault(e => e.NID == context.NodeID);
+            Node to = nodes.FirstOrDefault(e => e.ID == transition.Destination);
+            this.Invoke(transition, new ExecutingContext
+            {
+                From = current,
+                To = to,
+                Direction = WorkflowOpertaion.Go,
+                InstanceID= instance.InstanceID,
+                Data = context.Data,
+                Message = context.Message
+            }, context);
+        }
+
+        private void Invoke(Transition selectTransition, ExecutingContext executeContext, WorkflowJumpContext context)
+        {
+            string instanceID = context.InstanceID;
+            Node to = executeContext.To;
+            workflowService.InstanceService.Jump(selectTransition.Origin, selectTransition.Destination, instanceID, new WorkflowProcess()
             {
                 RelationshipID = executeContext.From.NID,
-                CreateTime=DateTime.Now,
-                ActorID = actorID,
+                CreateTime = DateTime.Now,
+                ActorID = context.ActorID,
                 Origin = executeContext.From.ID,
                 Destination = executeContext.To.ID,
                 TransitionID = selectTransition.NID,
-                InstanceID = executeContext.Instance.InstanceID,
+                InstanceID = executeContext.InstanceID,
                 NodeType = executeContext.From.NodeType,
                 Direction = WorkflowOpertaion.Go
             }, workflowService.ProcessService);
@@ -64,61 +77,49 @@ namespace Smartflow.Core.Components
             {
                 Transition transition = workflowService.NodeService.GetTransition(to);
                 if (transition == null) return;
-                Node nc = workflowService.NodeService.Query(instanceID).Where(e => e.ID == transition.Origin).FirstOrDefault();
-                Jump(new WorkflowContext()
+                Next(new WorkflowJumpContext()
                 {
-                    Instance = WorkflowInstance.GetInstance(instanceID),
-                    TransitionID = transition.NID,
+                    InstanceID = instanceID,
+                    NodeID = to.NID,
                     Data = context.Data,
                     Message = "系统流转",
-                    ActorID = context.ActorID,
-                    Current = nc
-                });
+                    ActorID = context.ActorID
+
+                }, transition);
             }
             else if (to.NodeType == WorkflowNodeCategory.Fork)
             {
                 foreach (Transition transition in to.Transitions)
                 {
-                    Jump(new WorkflowContext()
+                    Next(new WorkflowJumpContext()
                     {
-                        Instance = WorkflowInstance.GetInstance(instanceID),
-                        TransitionID = transition.NID,
+                        InstanceID = instanceID,
+                        NodeID = to.NID,
                         Data = context.Data,
                         Message = "系统流转",
-                        ActorID = context.ActorID,
-                        Current = executeContext.To
-                    });
+                        ActorID = context.ActorID
+                    }, transition);
                 }
             }
             else if (to.NodeType == WorkflowNodeCategory.Merge)
             {
-                IList<Transition> transitions =
-                    WorkflowGlobalServiceProvider.Resolve<IWorkflowTransitionService>().Query(instanceID);
-                int tc = transitions.Count(e => e.Destination == to.ID);
-                var newInstance = WorkflowInstance.GetInstance(instanceID);
-                int mc = WorkflowGlobalServiceProvider.Resolve<IWorkflowLinkService>().GetLink(to.ID, instanceID);
-                if (tc == mc)
+                IList<Transition> transitions = WorkflowGlobalServiceProvider.Resolve<IWorkflowTransitionService>().Query(instanceID);
+                int linkCount = WorkflowGlobalServiceProvider.Resolve<IWorkflowLinkService>().GetLink(to.ID, instanceID);
+                if (transitions.Count(e => e.Destination == to.ID) == linkCount)
                 {
                     foreach (Transition transition in to.Transitions)
                     {
-                        Jump(new WorkflowContext()
+                        Next(new WorkflowJumpContext()
                         {
-                            Instance = WorkflowInstance.GetInstance(instanceID),
-                            TransitionID = transition.NID,
+                            InstanceID = instanceID,
+                            NodeID = to.NID,
                             Data = context.Data,
                             Message = "系统流转",
-                            ActorID = context.ActorID,
-                            Current = executeContext.To
-                        });
+                            ActorID = context.ActorID
+                        }, transition);
                     }
                 }
             }
-        }
-
-        public void Jump(string to,  WorkflowContext context)
-        {
-            context.TransitionID = to;
-            this.Jump(context);
         }
     }
 }

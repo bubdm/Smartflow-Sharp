@@ -4,50 +4,46 @@
  Github : https://github.com/chengderen/Smartflow-Sharp
  ********************************************************************
  */
-using Smartflow.Core.Elements;
-using Smartflow.Core.Internals;
 using System;
-using System.Collections.Generic;
+using Smartflow.Core.Elements;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 
 namespace Smartflow.Core.Components
 {
-    public class BackService : IJump
+    public class BackService
     {
         private readonly AbstractWorkflow workflowService = WorkflowGlobalServiceProvider.Resolve<AbstractWorkflow>();
 
-        public void Jump(WorkflowContext context)
+        public void Back(WorkflowContext context)
         {
-            Node current = context.Current;
-
-            var to = workflowService.NodeService.GetPrevious(current);
-            //var to = workflowService.NodeService.GetNode(previous);
-            this.Invoke(to, new ExecutingContext
+            WorkflowInstance instance = WorkflowInstance.GetInstance(context.InstanceID);
+            Node current = instance.Current.FirstOrDefault(e => e.NID == context.NodeID);
+            Transition transition = workflowService.NodeService.GetPreviousTransition(current);
+            var to = workflowService.NodeService.GetPrevious(transition);
+            this.Invoke(transition.NID,new ExecutingContext
             {
                 From = current,
                 To = to,
                 Direction = WorkflowOpertaion.Back,
-                Instance = context.Instance,
+                InstanceID= context.InstanceID,
                 Data = context.Data,
-                Message = context.Message,
-                Result = context.Result
+                Message = context.Message
             }, context);
         }
 
-        private void Invoke(Node to, ExecutingContext executeContext, WorkflowContext context)
+        private void Invoke(string transitionID, ExecutingContext executeContext, WorkflowContext context)
         {
-            string instanceID = context.Instance.InstanceID;
-            workflowService.InstanceService.Jump(context.Current.ID, to.ID, instanceID, new WorkflowProcess()
+            string instanceID = context.InstanceID;
+            workflowService.InstanceService.Jump(executeContext.From.ID, executeContext.To.ID, instanceID, new WorkflowProcess()
             {
                 RelationshipID = executeContext.From.NID,
                 CreateTime=DateTime.Now,
                 ActorID = context.ActorID,
                 Origin = executeContext.From.ID,
                 Destination = executeContext.To.ID,
-                TransitionID = context.TransitionID,
-                InstanceID = executeContext.Instance.InstanceID,
+                TransitionID = transitionID,
+                InstanceID = executeContext.InstanceID,
                 NodeType = executeContext.From.NodeType,
                 Direction = WorkflowOpertaion.Back
 
@@ -55,23 +51,16 @@ namespace Smartflow.Core.Components
 
             workflowService.Actions.ForEach(pluin => pluin.ActionExecute(executeContext));
 
-            if (to.NodeType == WorkflowNodeCategory.Decision)
+            if (executeContext.To.NodeType == WorkflowNodeCategory.Decision)
             {
-                Jump(new WorkflowContext()
+                Back(new WorkflowContext()
                 {
-                    Instance = WorkflowInstance.GetInstance(instanceID),
-                    TransitionID = context.TransitionID,
-                    Data = context.Data,
+                    InstanceID = context.InstanceID,
                     Message = "系统流转",
                     ActorID = context.ActorID,
-                    Current = to
+                    NodeID =executeContext.To.NID
                 });
             }
-        }
-
-        public void Jump(string to, WorkflowContext context)
-        {
-            this.Jump(context);
         }
     }
 }

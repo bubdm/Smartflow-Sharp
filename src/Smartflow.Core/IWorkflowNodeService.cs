@@ -17,11 +17,6 @@ namespace Smartflow.Core
             get;
         }
 
-        IWorkflowCooperationService WorkflowCooperationService
-        {
-            get;
-        }
-
          WorkflowTransitionService TransitionService
         {
             get;
@@ -38,8 +33,10 @@ namespace Smartflow.Core
 
         List<Transition> GetExecuteTransition(Node entry);
 
-        Node GetPrevious(Node entry);
+        Node GetPrevious(Transition transition);
 
         Transition GetNextTransition(string id, string instanceID);
+
+        Transition GetPreviousTransition(Node entry);
     }
 }

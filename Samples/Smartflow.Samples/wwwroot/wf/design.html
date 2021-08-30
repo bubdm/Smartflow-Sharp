@@ -93,7 +93,7 @@
                             <label for="node_veto" class="smartflow_checkbox_label">否决权</label>
                         </div>
                         <div class="layui-form-item">
-                            <select placeholder="请选择退回策略" id="node_back_select" lay-filter="node_back_select" class="layui-select" style="width:100%;">
+                            <select placeholder="请选择退回策略" id="node_back_select" name="node_back_select" lay-filter="node_back_select" class="layui-select" style="width:100%;">
                                 <option></option>
                                 <option value="Smartflow.Core.Components.BackService">原路回退</option>
                                 <option value="Smartflow.Core.Components.BackSenderService">回退到发起人</option>
@@ -102,29 +102,6 @@
                     </form>
                 </div>
             </fieldset>
-
-            <fieldset class="layui-elem-field" lay-filter="attributes_cooperation" id="attributes_cooperation">
-                <legend>会签信息</legend>
-                <div class="layui-field-box">
-                    <form class="layui-form" lay-filter="form_cooperation">
-                        <div class="layui-form-item">
-                            <select placeholder="请选择协办策略" id="node_assistant_select" lay-filter="node_assistant_select" class="layui-select" style="width:100%;">
-                                <option></option>
-                                <option value="Smartflow.Core.Components.RequiredStrategyService">按需协办</option>
-                            </select>
-                        </div>
-                        <div class="layui-form-item">
-                            <select placeholder="请选择流转策略" id="node_cooperation_select" lay-filter="node_cooperation_select" class="layui-select" style="width:100%;">
-                                <option></option>
-                                <option value="Smartflow.Core.Components.FirstDecision">优先决策</option>
-                                <option value="Smartflow.Core.Components.DemocraticDecision">民主决策</option>
-                                <option value="Smartflow.Core.Components.LastDecision">最后决策</option>
-                            </select>
-                        </div>
-                    </form>
-                </div>
-            </fieldset>
-
             <fieldset class="layui-elem-field" lay-filter="attributes_strategy" id="attributes_strategy">
                 <legend>规则配置</legend>
                 <div class="layui-field-box">

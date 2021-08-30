@@ -12,18 +12,19 @@ namespace Smartflow.Bussiness.WorkflowService
 {
     public class RecordAction : IWorkflowAction
     {
-        private readonly BaseBridgeService bridgeService = new BaseBridgeService();
+        private readonly WorkflowBridgeService bridgeService = new WorkflowBridgeService();
         public void ActionExecute(ExecutingContext executeContext)
         {
             var current = executeContext.From;
-            if (executeContext.Instance.State != WorkflowInstanceState.Kill && current.NodeType != WorkflowNodeCategory.Decision&& current.NodeType!=WorkflowNodeCategory.Fork && current.NodeType != WorkflowNodeCategory.Merge)
+            WorkflowInstance instance = WorkflowInstance.GetInstance(executeContext.InstanceID);
+            if (instance.State != WorkflowInstanceState.Kill && current.NodeType != WorkflowNodeCategory.Decision&& current.NodeType!=WorkflowNodeCategory.Fork && current.NodeType != WorkflowNodeCategory.Merge)
             {
                 string UUID = (String)executeContext.Data.UUID;
                 string auditUserName = (String)executeContext.Data.Name;
 
                 CommandBus.Dispatch(new CreateRecord(), new Record
                 {
-                    InstanceID = executeContext.Instance.InstanceID,
+                    InstanceID = executeContext.InstanceID,
                     Name = executeContext.From.Name,
                     NodeID = executeContext.From.NID,
                     Comment = executeContext.Message,

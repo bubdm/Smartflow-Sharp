@@ -33,14 +33,7 @@ namespace Smartflow.Abstraction.Body
             set;
         }
 
-        [Required]
-        [StringLength(50)]
-        public string TransitionID
-        {
-            get;
-            set;
-        }
-
+ 
         [Required]
         public dynamic Data
         {

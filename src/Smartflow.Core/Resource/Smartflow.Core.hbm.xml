@@ -27,8 +27,6 @@
 		<property name="ID" column="ID" type="String" />
 		<property name="Name" column="Name" type="String" />
 		<property name="InstanceID" column="InstanceID" type="String" />
-		<property name="Cooperation" column="Cooperation" type="String" />
-		<property name="Assistant" column="Assistant" type="String" />
 		<property name="NodeType" column="NodeType"  type="NHibernate.Type.EnumStringType`1[[Smartflow.Core.WorkflowNodeCategory, Smartflow.Core]], NHibernate" />
 		<property name="Veto" column="Veto" type="String" />
 		<property name="Back" column="Back" type="String"  />

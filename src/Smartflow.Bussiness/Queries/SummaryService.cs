@@ -36,10 +36,15 @@ namespace Smartflow.Bussiness.Queries
             IQueryOver<Supervise> queries = session.QueryOver<Supervise>();
             SetQueryArg(queries.RootCriteria, info.Get());
             total = queries.RowCount();
-            return queries
+
+            var totallist = queries.List();
+
+            IList<Supervise> list=queries
                     .Skip((info.Page - 1) * info.Limit)
                     .Take(info.Limit)
                     .List();
+
+            return list;
         }
 
         private void SetQueryArg(ICriteria criteria, Dictionary<string, string> queryArg)

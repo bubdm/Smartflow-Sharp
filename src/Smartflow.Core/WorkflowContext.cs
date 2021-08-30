@@ -8,12 +8,11 @@ using Smartflow.Core.Components;
 using Smartflow.Core.Elements;
 using System;
 
-
 namespace Smartflow.Core
 {
     public class WorkflowContext
     {
-        public WorkflowInstance Instance
+        public string InstanceID
         {
             get;
             set;
@@ -37,31 +36,13 @@ namespace Smartflow.Core
             set;
         }
 
-
+        /// <summary>
+        /// 传递数据
+        /// </summary>
         public dynamic Data
         {
             get;
             set;
-        }
-
-        public string TransitionID
-        {
-            get;
-            set;
-        }
-
-        public Node Current
-        {
-            get;
-            set;
-        }
-
-        private bool result = false;
-
-        internal bool Result
-        {
-            get { return result; }
-            set { result = value; }
         }
     }
 }

@@ -10,7 +10,6 @@ using System.Collections.Generic;
 
 namespace Smartflow.Common
 {
-    [Serializable]
     public class Paging
     {
         public int Page

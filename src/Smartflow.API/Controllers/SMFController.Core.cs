@@ -10,6 +10,7 @@ using System.Linq;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Smartflow.Abstraction.Body;
+using Smartflow.Abstraction.DTO;
 using Smartflow.Bussiness.Commands;
 using Smartflow.Bussiness.Interfaces;
 using Smartflow.Bussiness.Models;
@@ -24,7 +25,6 @@ namespace Smartflow.API.Controllers
     [ApiController]
     public class SMFController : ControllerBase
     {
-        private readonly AbstractBridgeService _abstractService;
         private readonly IPendingService _pendingService;
         private readonly IBridgeService _bridgeService;
         private readonly IActorService _actorService;
@@ -37,9 +37,8 @@ namespace Smartflow.API.Controllers
                 return WorkflowGlobalServiceProvider.Resolve<AbstractWorkflow>().NodeService;
             }
         }
-        public SMFController(AbstractBridgeService abstractService, IWorkflowStructureService workflowStructureService, IPendingService pendingService, IBridgeService bridgeService, IActorService actorService, IMapper mapper)
+        public SMFController(IWorkflowStructureService workflowStructureService, IPendingService pendingService, IBridgeService bridgeService, IActorService actorService, IMapper mapper)
         {
-            _abstractService = abstractService;
             _pendingService = pendingService;
             _bridgeService = bridgeService;
             _actorService = actorService;
@@ -66,20 +65,124 @@ namespace Smartflow.API.Controllers
             var user = _actorService.GetUserByID(model.Creator);
             WorkflowInstance Instance = WorkflowInstance.GetInstance(instanceID);
             var current = GetCurrent(Instance, model.Creator);
-            string serialObject = GetAuditNext(current, model.CategoryCode, model.Creator, user.Name, out string selectTransitionID);
+            string serialObject = GetAuditNext(current, model.CategoryCode, model.Creator, user.Name);
 
-            WorkflowEngine.Instance.Jump(new WorkflowContext()
+            WorkflowEngine.Instance.Next(new WorkflowJumpContext()
             {
-                Instance = Instance,
+                InstanceID = instanceID,
                 ActorID = model.Creator,
                 Message = category.Name,
-                TransitionID = selectTransitionID,
-                Data = Newtonsoft.Json.JsonConvert.DeserializeObject(serialObject),
-                Current = current
+                NodeID = current.NID,
+                Data = Newtonsoft.Json.JsonConvert.DeserializeObject(serialObject)
             });
 
             LogProxy.Instance.Info(string.Format("启动{0}流程 实例ID{1}", model.CategoryCode, instanceID));
             return instanceID;
+        }
+
+        /// <summary>
+        /// 向下一步流转
+        /// </summary>
+        /// <param name="context"></param>
+        [Route("api/smf/next"), HttpPost]
+        public void Next(PostContextBody context)
+        {
+            WorkflowInstance Instance = WorkflowInstance.GetInstance(context.InstanceID);
+            var current = GetCurrent(Instance, context.ActorID);
+            WorkflowEngine.Instance.Next(new WorkflowJumpContext()
+            {
+                NodeID = current.NID,
+                InstanceID = context.InstanceID,
+                ActorID = context.ActorID,
+                Message = context.Message,
+                Data = context.Data
+            });
+        }
+
+        /// <summary>
+        /// 原路退回
+        /// </summary>
+        /// <param name="context"></param>
+        [Route("api/smf/back"), HttpPost]
+        public void Back(PostContextBody context)
+        {
+            WorkflowInstance Instance = WorkflowInstance.GetInstance(context.InstanceID);
+            var current = GetCurrent(Instance, context.ActorID);
+            WorkflowEngine.Instance.Back(new WorkflowContext()
+            {
+                NodeID = current.NID,
+                InstanceID = context.InstanceID,
+                ActorID = context.ActorID,
+                Message = context.Message,
+                Data = context.Data
+            });
+        }
+
+        /// <summary>
+        /// 退回到发起者
+        /// </summary>
+        /// <param name="context"></param>
+        [Route("api/smf/sender"), HttpPost]
+        public void Sender(PostContextBody context)
+        {
+            WorkflowInstance Instance = WorkflowInstance.GetInstance(context.InstanceID);
+            var current = GetCurrent(Instance, context.ActorID);
+            WorkflowEngine.Instance.BackSender(new WorkflowContext()
+            {
+                NodeID = current.NID,
+                InstanceID = context.InstanceID,
+                ActorID = context.ActorID,
+                Message = context.Message,
+                Data = context.Data
+            });
+        }
+
+        /// <summary>
+        /// 否决
+        /// </summary>
+        /// <param name="context"></param>
+        [Route("api/smf/veto"), HttpPost]
+        public void Veto(PostContextBody context)
+        {
+            WorkflowInstance Instance = WorkflowInstance.GetInstance(context.InstanceID);
+            var current = GetCurrent(Instance, context.ActorID);
+            WorkflowEngine.Instance.Veto(new WorkflowContext()
+            {
+                NodeID = current.NID,
+                InstanceID = context.InstanceID,
+                ActorID = context.ActorID,
+                Message = context.Message,
+                Data = context.Data
+            });
+        }
+
+        /// <summary>
+        /// 重新发起流程
+        /// </summary>
+        /// <param name="dto"></param>
+        [Route("api/smf/{instanceID}/{categoryCode}/reboot/{id}"), HttpPost]
+        public void Reboot(string instanceID, string categoryCode, string id)
+        {
+            WorkflowInstance wfInstance = WorkflowInstance.GetInstance(instanceID);
+            string resourceXml = wfInstance.Resource;
+            CommandBus.Dispatch(new DeleteWFRecord(), instanceID);
+            string newInstanceID = WorkflowEngine.Instance.Start(resourceXml);
+            Bridge bridge = _bridgeService.GetBridge(id);
+            bridge.InstanceID = newInstanceID;
+            CommandBus.Dispatch(new UpdateBridge(), bridge);
+
+            var user = _actorService.GetUserByID(bridge.Creator);
+            WorkflowInstance instance = WorkflowInstance.GetInstance(newInstanceID);
+            var current = GetCurrent(instance, bridge.Creator);
+            string serialObject = GetAuditNext(current, categoryCode, bridge.Creator, user.Name);
+            WorkflowEngine.Instance.Next(new WorkflowJumpContext()
+            {
+                InstanceID = newInstanceID,
+                ActorID = bridge.Creator,
+                Message = String.Empty,
+                NodeID = current.NID,
+                Data = Newtonsoft.Json.JsonConvert.DeserializeObject(serialObject)
+            });
         }
 
         /// <summary>
@@ -89,7 +192,7 @@ namespace Smartflow.API.Controllers
         /// <returns></returns>
 
         [Route("api/smf/{instanceID}/node/{actorID}"), HttpGet]
-        public dynamic Get(string instanceID, string actorID)
+        public dynamic GetNode(string instanceID, string actorID)
         {
             WorkflowInstance instance = WorkflowInstance.GetInstance(instanceID);
             IList<Pending> pendings = _pendingService.GetPending(instance.InstanceID, actorID);
@@ -126,6 +229,13 @@ namespace Smartflow.API.Controllers
                 };
             }
         }
+
+        /// <summary>
+        /// 获取当前节点
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <param name="actorID"></param>
+        /// <returns></returns>
         private Node GetCurrent(WorkflowInstance instance, string actorID)
         {
             IList<Pending> pendings = _pendingService.GetPending(instance.InstanceID, actorID);
@@ -136,66 +246,11 @@ namespace Smartflow.API.Controllers
                 current.FirstOrDefault();
         }
 
-        /// <summary>
-        /// 跳转
-        /// </summary>
-        /// <param name="context"></param>
-        [Route("api/smf/jump"), HttpPost]
-        public void Jump(PostContextBody context)
-        {
-            WorkflowInstance Instance = WorkflowInstance.GetInstance(context.InstanceID);
-            var current = GetCurrent(Instance, context.ActorID);
-            WorkflowEngine.Instance.Jump(new WorkflowContext()
-            {
-                Instance = Instance,
-                ActorID = context.ActorID,
-                Message = context.Message,
-                TransitionID = context.TransitionID,
-                Data = context.Data,
-                Current = current
-            });
-        }
-
-        /// <summary>
-        /// 重新发起流程
-        /// </summary>
-        /// <param name="dto"></param>
-        [Route("api/smf/{instanceID}/{categoryCode}/reboot/{id}"), HttpPost]
-        public void Reboot(string instanceID, string categoryCode, string id)
-        {
-            WorkflowInstance wfInstance = WorkflowInstance.GetInstance(instanceID);
-            string resourceXml = wfInstance.Resource;
-
-            CommandBus.Dispatch(new DeleteWFRecord(), instanceID);
-            string newInstanceID = WorkflowEngine.Instance.Start(resourceXml);
-
-            Bridge bridge = _bridgeService.GetBridge(id);
-            bridge.InstanceID = newInstanceID;
-            CommandBus.Dispatch(new UpdateBridge(), bridge);
-
-            var user = _actorService.GetUserByID(bridge.Creator);
-            WorkflowInstance instance = WorkflowInstance.GetInstance(newInstanceID);
-            var current = GetCurrent(instance, bridge.Creator);
-
-            string serialObject = GetAuditNext(current, categoryCode, bridge.Creator, user.Name, out string selectTransitionID);
-            WorkflowEngine.Instance.Jump(new WorkflowContext()
-            {
-                Instance = instance,
-                ActorID = bridge.Creator,
-                Message = String.Empty,
-                TransitionID = selectTransitionID,
-                Current = GetCurrent(instance, bridge.Creator),
-                Data = Newtonsoft.Json.JsonConvert.DeserializeObject(serialObject)
-            });
-        }
-
-        private string GetAuditNext(Node current, string categoryCode, string creator, string name, out string selectTransitionID)
+        private string GetAuditNext(Node current, string categoryCode, string creator, string name)
         {
             string instanceID = current.InstanceID;
             Transition transitionSelect = current.Transitions.FirstOrDefault();
             Node node = NodeService.FindNodeByID(transitionSelect.Destination, instanceID);
-
-            selectTransitionID = transitionSelect.NID;
             List<string> groupIDs = new List<string>();
             List<string> actorIDs = new List<string>();
             List<string> carbonIDs = new List<string>();
@@ -241,19 +296,24 @@ namespace Smartflow.API.Controllers
             WorkflowEngine.Instance.Kill(instance, new WorkflowContext()
             {
                 Message = "终止流程",
-                Instance = instance,
+                InstanceID = instanceID,
                 NodeID = current.NID,
-                Data = new { CategoryCode = categoryCode },
-                Current = current
+                Data = new { CategoryCode = categoryCode }
             });
         }
 
         [Route("api/smf/{instanceID}/transition/{actorID}/list"), HttpGet]
-        public IEnumerable<Transition> GetTransition(string instanceID, string actorID)
+        public IEnumerable<CommandTransitionDto> GetTransition(string instanceID, string actorID)
         {
             WorkflowInstance instance = WorkflowInstance.GetInstance(instanceID);
             var current = GetCurrent(instance, actorID);
-            return NodeService.GetExecuteTransition(current);
+            IEnumerable<Transition> transitions = NodeService.GetExecuteTransition(current);
+            IList<CommandTransitionDto> commands = new List<CommandTransitionDto>();
+            foreach (Transition transition in transitions)
+            {
+                commands.Add(new CommandTransitionDto { Code = transition.NID, Name = transition.Name });
+            }
+            return commands;
         }
 
         /// <summary>
@@ -283,19 +343,6 @@ namespace Smartflow.API.Controllers
             Transition transition = NodeService.GetNextTransition(destination, instanceID);
             Node current = NodeService.FindNodeByID(transition.Destination, instanceID);
             return current.NodeType.ToString();
-        }
-
-        /// <summary>
-        /// 获取当前节点是否会签
-        /// </summary>
-        /// <param name="id">实例ID</param>
-        /// <returns></returns>
-        [Route("api/smf/{instanceID}/cooperation/{actorID}"), HttpGet]
-        public int GetNodeCooperation(string instanceID, string actorID)
-        {
-            WorkflowInstance instance = WorkflowInstance.GetInstance(instanceID);
-            Node current = GetCurrent(instance, actorID);
-            return String.IsNullOrEmpty(current.Cooperation) ? 0 : 1;
         }
 
         /// <summary>

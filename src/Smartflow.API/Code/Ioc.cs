@@ -22,7 +22,7 @@ namespace Smartflow.API.Code
             services.AddTransient<IPendingService, PendingService>();
             services.AddTransient<IRecordService, RecordService>();
             services.AddTransient<IQuery<IList<Constraint>>, ConstraintService>();
-            services.AddTransient<AbstractBridgeService, BaseBridgeService>();
+            services.AddTransient<AbstractBridgeService, WorkflowBridgeService>();
             services.AddTransient<IOrganizationService, OrganizationService>();
             services.AddTransient<IActorService, ActorService>();
             services.AddTransient<IWorkflowStructureService, WorkflowStructureService>();

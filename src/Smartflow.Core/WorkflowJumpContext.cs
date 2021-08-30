@@ -4,15 +4,13 @@
  Github : https://github.com/chengderen/Smartflow-Sharp
  ********************************************************************
  */
+using Smartflow.Core.Components;
+using Smartflow.Core.Elements;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Smartflow.Core
 {
-    public interface IWorkflowCooperationService : IWorkflowQuery<List<WorkflowCooperation>, string>, IWorkflowPersistent<WorkflowCooperation>
+    public class WorkflowJumpContext: WorkflowContext
     {
-        void Delete(string instanceID, string nodeID);
     }
 }

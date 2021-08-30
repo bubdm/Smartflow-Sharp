@@ -3,8 +3,7 @@
  Home page: http://www.smartflow-sharp.com
  ********************************************************************
  */
-
-; (function () {
+(function (factory) {
 
     function loadTree(nx) {
         var ajaxSettings = { url: 'api/setting/organization/list', type: 'get' };
@@ -61,9 +60,11 @@
         nx.organization = selectNodes;
     }
 
-    window.setting = {
+    factory({
         load: loadTree,
         set: setTree
-    };
+    });
 
-})();
+})(function (option) {
+    window.setting = option;
+});

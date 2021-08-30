@@ -2,20 +2,21 @@
 <hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
                    assembly="Smartflow.Core"
                    namespace="Smartflow.Core">
-  <class name="WorkflowInstance" table="t_instance">
-    <id name="InstanceID" column="InstanceID" type="String" generator="assigned" />
-    <property name="State" column="State" type="NHibernate.Type.EnumStringType`1[[Smartflow.Core.WorkflowInstanceState, Smartflow.Core]], NHibernate"  />
-    <property name="Resource" column="Resource" type="String" />
-  </class>
+	<class name="WorkflowInstance" table="t_instance">
+		<id name="InstanceID" column="InstanceID" type="String" generator="assigned" />
+		<property name="State" column="State" type="NHibernate.Type.EnumStringType`1[[Smartflow.Core.WorkflowInstanceState, Smartflow.Core]], NHibernate"  />
+		<property name="Resource" column="Resource" type="String" />
+	</class>
 
-  <class name="WorkflowLink" table="t_link">
-    <id name="NID" column="NID" type="String">
-        <generator class="uuid.hex">
-          <param name="format"></param>
-          <param name="separator"></param>
-        </generator>
-    </id>
-    <property name="InstanceID" column="InstanceID" type="String" />
-    <property name="RelationshipID" column="RelationshipID" type="String" />
-  </class>
+	<class name="WorkflowLink" table="t_link">
+		<id name="NID" column="NID" type="String">
+			<generator class="uuid.hex">
+				<param name="format"></param>
+				<param name="separator"></param>
+			</generator>
+		</id>
+		<property name="InstanceID" column="InstanceID" type="String" />
+		<property name="RelationshipID" column="RelationshipID" type="String" />
+		<property name="CreateTime" column="CreateTime" type="DateTime" />
+	</class>
 </hibernate-mapping>

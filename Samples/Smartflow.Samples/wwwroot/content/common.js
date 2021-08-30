@@ -1,7 +1,7 @@
 ﻿(function () {
     window.util = {
         prefix: 'http://localhost:8083/',
-        smf: 'http://localhost:8097/',
+        smf: 'http://localhost:26260/',
         process: 'http://localhost:8083/wf/image.html?id=',
         pending: 'http://localhost:8083/wf/pending.html?id=',
         actor: 'http://localhost:8083/wf/actorSelect.html',

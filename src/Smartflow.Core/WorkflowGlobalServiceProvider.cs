@@ -26,10 +26,8 @@ namespace Smartflow.Core
             _globalTypeCollection.Add(typeof(WorkflowInstanceService));
             _globalTypeCollection.Add(typeof(DefaultActionService));
             _globalTypeCollection.Add(typeof(ScriptActionService));
-            _globalTypeCollection.Add(typeof(WorkflowCooperationService));
             _globalTypeCollection.Add(typeof(WorkflowTransitionService));
             _globalTypeCollection.Add(typeof(WorkflowLinkService));
-            _globalTypeCollection.Add(typeof(WorkflowAssistantService));
         }
 
         public static void RegisterGlobalService(Type registerType)
@@ -49,18 +47,6 @@ namespace Smartflow.Core
                       .FirstOrDefault();
 
             return (map == null) ? default : (T)Smartflow.Core.Internals.Utils.CreateInstance(map);
-        }
-
-        /// <summary>
-        /// 移除全局服务
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        public static void Remove<T>() where T : class
-        {
-            _globalTypeCollection
-               .Where(o => typeof(T).IsAssignableFrom(o))
-               .ToList()
-               .ForEach((entry) => _globalTypeCollection.Remove(entry));
         }
 
         /// <summary>

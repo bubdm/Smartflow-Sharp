@@ -38,14 +38,6 @@ namespace Smartflow.Core
             }
         }
 
-        //public IStrategyService StrategyService
-        //{
-        //    get
-        //    {
-        //        return WorkflowGlobalServiceProvider.Resolve<IStrategyService>() ?? new DefaultStrategyService();
-        //    }
-        //}
-
         public abstract string Start(string resourceXml);
     }
 }

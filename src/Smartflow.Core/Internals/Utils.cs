@@ -20,6 +20,7 @@ namespace Smartflow.Core.Internals
     {
         public static readonly string CONST_REJECT_TRANSITION_ID = "NID_REJECT_ID_80_11";
         public static readonly string CONST_BACK_TRANSITION_ID = "NID_BACK_ID_80_11";
+        public static readonly string CONST_BACKSENDER_TRANSITION_ID = "NID_BACK_ID_80_12";
         public static readonly Transition CONST_REJECT_TRANSITION = new Transition
         {
             NID = Utils.CONST_REJECT_TRANSITION_ID,
@@ -30,6 +31,12 @@ namespace Smartflow.Core.Internals
         {
             NID = Utils.CONST_BACK_TRANSITION_ID,
             Name = "原路退回"
+        };
+
+        public static readonly Transition CONST_BACKSENDER_TRANSITION = new Transition
+        {
+            NID = Utils.CONST_BACKSENDER_TRANSITION_ID,
+            Name = "退回到发起人"
         };
 
         public static WorkflowNodeCategory Convert(string category)

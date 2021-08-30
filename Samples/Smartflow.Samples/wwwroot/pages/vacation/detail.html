@@ -60,31 +60,22 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="layui-form-item">
-                        <div class="layui-row">
-                            <div class="layui-col-md12">
-                                <label class="layui-form-label">请假原因</label>
-                                <div class="layui-input-block">
-                                    <textarea placeholder="请输入内容" name="Reason" lay-verify="required" lay-reqtext="请假原因不能为空" class="layui-textarea"></textarea>
-                                </div>
-                            </div>
+                        <label class="layui-form-label">请假原因</label>
+                        <div class="layui-input-block">
+                            <textarea placeholder="请输入内容" name="Reason" lay-verify="required" lay-reqtext="请假原因不能为空" class="layui-textarea"></textarea>
                         </div>
                     </div>
                     <div class="layui-form-item">
-                        <div class="layui-row">
-                            <div class="layui-col-md12">
-                                <table class="layui-table" id="record-table"></table>
-                            </div>
-                        </div>
+                        <table class="layui-table record-table"></table>
                     </div>
                 </div>
             </div>
         </div>
         <div class="layui-card-footer">
             <div class="ar">
-                <input type="button" class="layui-btn" id="image" value="查看进度" />
-                <input type="button" class="layui-btn" id="submit" value="提交" lay-submit lay-filter="form-vacation-ok" />
+                <input type="button" class="layui-btn process" id="image" value="查看进度" />
+                <input type="button" class="layui-btn submit" id="submit" value="提交" lay-submit lay-filter="form-vacation-ok" />
             </div>
         </div>
     </form>
@@ -97,7 +88,7 @@
             init();
             function init() {
                 util.ajaxService({
-                    url: 'api/vacation/' + id+'/info',
+                    url: 'api/vacation/' + id + '/info',
                     type: 'get',
                     success: function (o) {
                         layui.form.val('form-vacation', o);
@@ -106,8 +97,8 @@
             }
             $.Record({ key: id });
             $.Audit({
-                image: '#image',
-                button: '#submit',
+                image: 'input.process',
+                button: 'input.submit',
                 key: id
             });
         });

@@ -3,9 +3,9 @@
  Home page: http://www.smartflow-sharp.com
  ********************************************************************
  */
-; (function () {
+; (function (factory) {
 
-    window.setting = {
+    factory({
         load: function (nx) {
             var form = layui.form;
             form.val('form-bus', {
@@ -21,6 +21,8 @@
                 nx.brush.text(nx.name);
             }
         }
-    };
+    });
 
-})();
+})(function (option) {
+    window.setting = option;
+});

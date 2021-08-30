@@ -28,7 +28,7 @@ namespace Smartflow.Core
                     .SetParameter("RelationshipID",origin)
                     .SetParameter("InstanceID",instanceID)
                     .ExecuteUpdate(),
-                (session) => session.Persist(new WorkflowLink {  InstanceID = instanceID,RelationshipID = destination }),
+                (session) => session.Persist(new WorkflowLink {  InstanceID = instanceID,RelationshipID = destination,CreateTime=DateTime.Now }),
                 (session) => processService.Persistent(process, (entry) => session.Persist(entry))
             };
 
@@ -49,7 +49,8 @@ namespace Smartflow.Core
             callback(new WorkflowLink
             {
                 InstanceID = instanceID,
-                RelationshipID = nodeID
+                RelationshipID = nodeID,
+                CreateTime=DateTime.Now
             });
 
             return instanceID;
@@ -63,7 +64,6 @@ namespace Smartflow.Core
             session.Update(instance);
             session.Flush();
         }
-   
 
         public WorkflowInstance Query(string instanceID)
         {

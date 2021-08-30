@@ -18,9 +18,4 @@ namespace Smartflow.Core
     {
         T Query(S queryArg);
     }
-
-    public interface IWorkflowQuery
-    {
-        IList<T> Query<T>(String instanceID);
-    }
 }

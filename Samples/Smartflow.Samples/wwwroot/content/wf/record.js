@@ -3,7 +3,7 @@
  Home page: http://www.smartflow-sharp.com
  ********************************************************************
  */
-; (function () {
+(function (factory) {
 
     function Record(option) {
         this.setting = $.extend({}, option);
@@ -11,9 +11,10 @@
     }
 
     Record.prototype.init = function () {
-        var $this = this;
-        var setting = $this.setting;
-        this.loadBrigdge(setting.key,function (s) {
+        var $this = this,
+            setting = $this.setting;
+
+        this.loadBrigdge(setting.key, function (s) {
             $this.load(s.InstanceID);
         });
     }
@@ -21,8 +22,7 @@
     Record.prototype.load = function (instanceID) {
         var $this = this,
             setting = this.setting,
-            url = util.format($this.setting.url, { instanceID: instanceID });
-
+            url = util.format($this.setting.urls.url, { instanceID: instanceID });
         util.ajaxWFService({
             url: url,
             type: 'get',
@@ -32,15 +32,12 @@
                     var el = setting.templet;
                     htmlArray.push(
                         el.replace(/{{Name}}/ig, setting.Type ? this.OrganizationName : this.Name)
-                          //  .replace(/{{NodeName}}/ig, setting.Type ? this.OrganizationName:this.NodeName)
-                         //   .replace(/{{UserGroup}}/ig, this.UserGroup)
                             .replace(/{{Comment}}/ig, this.Comment)
-                            .replace(/{{CreateTime}}/ig, this.CreateTime ? layui.util.toDateString(this.CreateTime, 'yyyy-MM-dd HH:mm') : '')
+                            .replace(/{{CreateTime}}/ig, this.CreateTime ? layui.util.toDateString(this.CreateTime, 'yyyy.MM.dd HH:mm') : '')
                             .replace(/{{Sign}}/ig, util.isEmpty(this.Url) ? '' : "<image src=\"" + this.Url + "\" />")
                             .replace(/{{AuditUserName}}/ig, this.AuditUserName)
                     );
                 });
-
                 $(setting.id).html(htmlArray.join(''));
                 setting.done && setting.done(serverData);
             }
@@ -48,9 +45,8 @@
     }
 
     Record.prototype.loadBrigdge = function (id, callback) {
-        var $this = this;
-
-        var url = util.format($this.setting.bridge, { id: id });
+        var $this = this,
+            url = util.format($this.setting.urls.bridge, { id: id });
         util.ajaxWFService({
             type: 'get',
             url: url,
@@ -64,14 +60,20 @@
         layui.table.reload(this.setting.config.id);
     };
 
+    factory(function (option) {
+        return new Record(option);
+    });
+
+})(function (createInstance) {
     $.Record = function (option) {
-        var templet = "<tr><td class=\"flow-node\" next=\"{{NodeName}}\">{{Name}}</td><td class=\"flow-message\">{{Comment}}<div class=\"flow-audit-info\"><span>审批时间：{{CreateTime}}</span><span>{{Sign}}</span><span>审批人：{{AuditUserName}}</span></div></td></tr>";
-        return new Record($.extend({
+        var templet = "<tr><td class=\"flow-node\" rowspan=\"2\">{{Name}}</td><td class=\"flow-message\">{{Comment}}</td><tr><td colspan=\"2\" class=\"flow-sign\">{{CreateTime}}&nbsp;&nbsp;&nbsp;{{AuditUserName}}</td></tr></tr>";
+        return createInstance(Object.assign({
             templet: templet,
-            id: '#record-table',
-            url: 'api/setting/record/{instanceID}/list',
-            bridge: 'api/setting/bridge/{id}/info'
+            id: 'table.record-table',
+            urls: {
+                url: 'api/setting/record/{instanceID}/list',
+                bridge: 'api/setting/bridge/{id}/info'
+            }
         }, option));
     }
-
-})();
+});

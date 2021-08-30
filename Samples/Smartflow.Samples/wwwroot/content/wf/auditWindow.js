@@ -1,10 +1,11 @@
-﻿(function () {
+﻿(function (factory) {
 
     function AuditWindow(option) {
         var $this = this;
         var instanceID = util.doQuery("instanceID");
         var code = util.doQuery('code');
         this.back = "NID_BACK_ID_80_11";
+        this.sender = "NID_BACK_ID_80_12";
         this.veto = "NID_REJECT_ID_80_11";
         this.user = util.getUser();
         this.nodeSetting = {
@@ -53,7 +54,7 @@
     AuditWindow.prototype.show = function (id, callback) {
         var $this = this,
             setting = $this.settings;
-        if (id == $this.back) {
+        if (id == $this.back || id == $this.sender) {
             $("#next_audit_user").hide();
         } else {
             var url = util.format(setting.showUrl, {
@@ -70,34 +71,12 @@
                         $("#next_audit_user").hide();
                     }
                     else {
-                        $this.checkCooperation(function () {
-                            $this.actorSelect(id);
-                            $("#next_audit_user").show();
-                        });
+                        $this.actorSelect(id);
+                        $("#next_audit_user").show();
                     }
                 }
             });
         }
-    }
-
-    AuditWindow.prototype.checkCooperation = function (callback) {
-        var $this = this,
-            setting = $this.settings;
-        var url = util.format(setting.cooperation, {
-            instanceID: setting.instanceID,
-            actorID: $this.user.ID
-        });
-        util.ajaxWFService({
-            url: url,
-            type: 'get',
-            success: function (cooperation) {
-                if (parseInt(cooperation, 10) == 1) {
-                    $("#next_audit_user").hide();
-                } else {
-                    callback && callback();
-                }
-            }
-        });
     }
 
     AuditWindow.prototype._bindSelect = function () {
@@ -108,12 +87,12 @@
             });
 
         util.ajaxWFService({
-            url:url,
+            url: url,
             type: 'get',
             success: function (serverData) {
                 var htmlArray = [];
                 $.each(serverData, function () {
-                    htmlArray.push("<option value='" + this.NID + "'>" + this.Name + "</option>");
+                    htmlArray.push("<option value='" + this.Code + "'>" + this.Name + "</option>");
                 });
                 $(setting.selectOption).html(htmlArray.join(''));
                 $this.show($(setting.selectOption).val());
@@ -124,7 +103,6 @@
 
     AuditWindow.prototype._initEvent = function () {
         var $this = this;
-        //审核窗口中确定按钮
         $($this.settings.buttonId).click(function () {
             var data = layui.form.val('next_form'),
                 message = data.message;
@@ -141,7 +119,7 @@
         });
 
         var form = layui.form;
-        form.on('select(ddl_operate)', function (data) {
+        form.on('select(operate)', function (data) {
             if (data.value === 'NID_REJECT_ID_80_11') {
                 $("#next_audit_user").hide();
             } else {
@@ -203,14 +181,14 @@
             }
         });
     }
+
     AuditWindow.prototype.jump = function (message, transition) {
-        var $this = this;
+        var $this = this, url;
         var settings = this.settings,
             result = $this.user,
             param = JSON.stringify({
                 instanceID: settings.instanceID,
                 actorID: result.ID,
-                transitionID: transition,
                 message: message,
                 data: {
                     CategoryCode: settings.code,
@@ -223,12 +201,24 @@
                 }
             });
 
+        if (transition === $this.back) {
+            url = "api/smf/back";
+        }
+        else if (transition === $this.sender) {
+            url = "api/smf/sender";
+        }
+        else if (transition === $this.veto) {
+            url = "api/smf/veto";
+        }
+        else {
+            url = "api/smf/next";
+        }
         util.ajaxWFService({
-            url: settings.jump,
+            url: url,
             data: param,
-            dataType:'text',
+            dataType: 'text',
             success: function () {
-              $this.close();
+                $this.close();
             }
         });
     }
@@ -242,9 +232,11 @@
         return data.join(',');
     }
 
-    $.AuditWindow = function (option) {
+    factory(function (option) {
         return new AuditWindow(option);
-    };
+    });
 
-})();
+})(function (instance) {
+    $.AuditWindow = instance;
+});
 

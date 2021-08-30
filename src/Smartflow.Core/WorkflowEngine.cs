@@ -19,7 +19,6 @@ namespace Smartflow.Core
         private static readonly WorkflowEngine singleton = new WorkflowEngine();
 
         private readonly AbstractWorkflow workflowService = WorkflowGlobalServiceProvider.Resolve<AbstractWorkflow>();
-
         private WorkflowEngine()
         {
         }
@@ -40,50 +39,45 @@ namespace Smartflow.Core
         }
 
         /// <summary>
-        /// 进行流程跳转
+        /// 否决
         /// </summary>
-        /// <param name="context"></param>
-        public void Jump(WorkflowContext context)
+        public void Veto(WorkflowContext context)
         {
-            WorkflowInstance instance = context.Instance;
-            if (instance.State == WorkflowInstanceState.Running)
-            {
-                var current = context.Current;
-                if (!String.IsNullOrEmpty(context.Current.Cooperation))
-                {
-                    context.TransitionID = CooperationJumpService.Cooperation(context, new ExecutingContext
-                    {
-                        From = current,
-                        To = current,
-                        Direction = context.TransitionID == Utils.CONST_BACK_TRANSITION_ID ? WorkflowOpertaion.Back : WorkflowOpertaion.Go,
-                        Instance = context.Instance,
-                        Data = context.Data,
-                        Message = context.Message,
-                        Result = context.Result
-                    });
-                }
-
-                if (!String.IsNullOrWhiteSpace(context.TransitionID))
-                {
-                    context.Result = true;
-                    JumpFactory.Create(context.TransitionID).Jump(context);
-                }
-            }
+            new VetoService().Veto(context);
         }
 
+        /// <summary>
+        /// 原路退回
+        /// </summary>
+        public void Back(WorkflowContext context)
+        {
+            new BackService().Back(context);
+        }
+
+        /// <summary>
+        /// 退回到发起者
+        /// </summary>
+        public void BackSender(WorkflowContext context)
+        {
+            new BackSenderService().Back(context);
+        }
+
+        /// <summary>
+        /// 下一步流转
+        /// </summary>
+        public void Next(WorkflowJumpContext context)
+        {
+            new JumpService().Next(context);
+        }
+
+        /// <summary>
+        /// 终止流程
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <param name="context"></param>
         public void Kill(WorkflowInstance instance, WorkflowContext context)
         {
-            if (instance.State == WorkflowInstanceState.Running)
-            {
-                workflowService.InstanceService.Transfer(WorkflowInstanceState.Kill, instance.InstanceID);
-                workflowService.Actions.ForEach(pluin => pluin.ActionExecute(new ExecutingContext()
-                {
-                    From = context.Current,
-                    To = context.Current,
-                    Instance = WorkflowInstance.GetInstance(instance.InstanceID),
-                    Data = context.Data
-                }));
-            }
+            new KillService().Kill(context);
         }
     }
 }

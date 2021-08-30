@@ -3,10 +3,10 @@
  Home page: http://www.smartflow-sharp.com
  ********************************************************************
  */
-; (function () {
+; (function (factory) {
 
     function loadAction(nx) {
-        
+
 
         var form = layui.form;
         loadDataSource(function () {
@@ -37,14 +37,14 @@
         });
     }
 
-    window.setting = {
+    factory({
         load: loadAction,
         set: function (nx) {
-
             var form = layui.form.val('form_normal');
-
             nx.command = $.extend(nx.command || {}, form);
         }
-    };
+    });
 
-})();
+})(function (option) {
+    window.setting = option;
+});

@@ -12,13 +12,14 @@ namespace Smartflow.Bussiness.WorkflowService
 {
     public class PendingAction : IWorkflowAction
     {
-        private readonly BaseBridgeService bridgeService = new BaseBridgeService();
+        private readonly WorkflowBridgeService bridgeService = new WorkflowBridgeService();
 
         public void ActionExecute(ExecutingContext executeContext)
         {
-            if (executeContext.Instance.State == WorkflowInstanceState.Reject || executeContext.Instance.State == WorkflowInstanceState.Kill)
+            WorkflowInstance instance = WorkflowInstance.GetInstance(executeContext.InstanceID);
+            if (instance.State == WorkflowInstanceState.Reject || instance.State == WorkflowInstanceState.Kill)
             {
-                CommandBus.Dispatch(new DeletePending(),executeContext.Instance.InstanceID);
+                CommandBus.Dispatch(new DeletePending(), instance.InstanceID);
             }
             else
             {
@@ -29,21 +30,14 @@ namespace Smartflow.Bussiness.WorkflowService
                 }
                 else
                 {
-                    if (!executeContext.Result && !String.IsNullOrEmpty(executeContext.From.Cooperation))
+                    string instanceID = instance.InstanceID;
+                    if (current.NodeType == WorkflowNodeCategory.End)
                     {
-                        CooperationPending.Execute(executeContext);
+                        CommandBus.Dispatch(new DeletePending(), instanceID);
                     }
                     else
                     {
-                        string instanceID = executeContext.Instance.InstanceID;
-                        if (current.NodeType == WorkflowNodeCategory.End)
-                        {
-                            CommandBus.Dispatch(new DeletePending(), instanceID);
-                        }
-                        else
-                        {
-                            AssignToPendingUser(executeContext, current);
-                        }
+                        AssignToPendingUser(executeContext, current);
                     }
                 }
             }
@@ -54,9 +48,9 @@ namespace Smartflow.Bussiness.WorkflowService
         /// </summary>
         private void AssignToPendingUser(ExecutingContext executeContext,Node current)
         {
-            string instanceID = executeContext.Instance.InstanceID;
+            string instanceID = executeContext.InstanceID;
             //会签或分支节点取默认参与人者；非会签取用户选择的参与者
-            bool result = (!String.IsNullOrEmpty(executeContext.From.Cooperation) || executeContext.From.NodeType == WorkflowNodeCategory.Decision || executeContext.From.NodeType == WorkflowNodeCategory.Fork || executeContext.From.NodeType == WorkflowNodeCategory.Merge);
+            bool result = (executeContext.From.NodeType == WorkflowNodeCategory.Decision || executeContext.From.NodeType == WorkflowNodeCategory.Fork || executeContext.From.NodeType == WorkflowNodeCategory.Merge);
             List<User> userList = result ?
                 bridgeService.GetActorByGroup(current, executeContext.Direction) :
                 bridgeService.GetActorByGroup((String)executeContext.Data.Actor, (String)executeContext.Data.Group, (String)executeContext.Data.Organization, current, executeContext.Direction);
@@ -70,8 +64,6 @@ namespace Smartflow.Bussiness.WorkflowService
             {
                 WritePending(user.ID, executeContext);
             }
-
-            CommandBus.Dispatch(new CreateAssistant(), instanceID);
         }
 
 
@@ -81,7 +73,7 @@ namespace Smartflow.Bussiness.WorkflowService
         /// <param name="executeContext">执行上下文</param>
         private void DecisionJump(ExecutingContext executeContext)
         {
-            string instanceID = executeContext.Instance.InstanceID;
+            string instanceID = executeContext.InstanceID;
             string NID = executeContext.From.NID;
             Dictionary<string, object> deleteArg = new Dictionary<string, object>()
             {
@@ -100,7 +92,7 @@ namespace Smartflow.Bussiness.WorkflowService
         {
             var node = executeContext.To;
             string CategoryCode = (String)executeContext.Data.CategoryCode;
-            string instanceID = (String)executeContext.Instance.InstanceID;
+            string instanceID =executeContext.InstanceID;
 
             Category model = new CategoryService().Query()
                  .FirstOrDefault(cate => cate.NID == CategoryCode);

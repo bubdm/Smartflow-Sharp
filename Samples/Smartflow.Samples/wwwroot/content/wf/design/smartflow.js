@@ -22,11 +22,9 @@
         y: 'y',
         length: 'length',
         command: 'command',
-        cooperation: 'cooperation',
         veto: 'veto',
         back: 'back',
         url: 'url',
-        assistant:'assistant',
         dynamic:'dynamic'
     };
 
@@ -580,11 +578,7 @@
         this.rule = [];
         this.tickness = 20;
         this.isCurrent = false;
-
         this.veto = 0;
-        this.cooperation = '';
-        this.assistant = '';
-
         this.back = '';
         this.url = '';
     }
@@ -633,8 +627,7 @@
         node.setAttribute(config.id, self[config.id]);
         node.setAttribute(config.name, self[config.name]);
         node.setAttribute(config.layout, self.x + ' ' + self.disX + ' ' + self.y + ' ' + self.disY);
-        node.setAttribute(config.cooperation, self.cooperation == '0' ? '' : self.cooperation);
-        node.setAttribute(config.assistant, self.assistant);
+
         node.setAttribute(config.category, self.category);
         node.setAttribute(config.veto, self.veto);
         node.setAttribute(config.back, self.back);
@@ -2016,8 +2009,6 @@
             name: 'value',
             layout: 'value',
             category: 'value',
-            cooperation: 'value',
-            assistant:'value',
             veto: 'value',
             back: 'value',
             url:'value',

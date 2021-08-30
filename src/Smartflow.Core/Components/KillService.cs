@@ -7,29 +7,26 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Smartflow.Core.Elements;
 
 namespace Smartflow.Core.Components
 {
-    public class VetoService
+    public class KillService
     {
         private readonly AbstractWorkflow workflowService = WorkflowGlobalServiceProvider.Resolve<AbstractWorkflow>();
-
-        public void Veto(WorkflowContext context)
+        public void Kill(WorkflowContext context)
         {
             WorkflowInstance instance = WorkflowInstance.GetInstance(context.InstanceID);
-            Node current = instance.Current.FirstOrDefault(e => e.NID == context.NodeID);
             if (instance.State == WorkflowInstanceState.Running)
             {
-                workflowService.InstanceService.Transfer(WorkflowInstanceState.Reject, instance.InstanceID);
+                Node current = instance.Current.FirstOrDefault(e => e.NID == context.NodeID);
+                workflowService.InstanceService.Transfer(WorkflowInstanceState.Kill, instance.InstanceID);
                 workflowService.Actions.ForEach(pluin => pluin.ActionExecute(new ExecutingContext()
                 {
                     From = current,
                     To = current,
-                    InstanceID = context.InstanceID,
-                    Message = context.Message,
-                    Direction = WorkflowOpertaion.Decide,
+                    InstanceID =instance.InstanceID,
+                    Message="终止流程",
                     Data = context.Data
                 }));
             }

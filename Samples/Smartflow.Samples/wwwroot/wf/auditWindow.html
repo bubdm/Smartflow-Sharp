@@ -13,16 +13,13 @@
     <script type="text/javascript">
         $(function () {
             $.AuditWindow({
-                back: 'api/smf/back',
-                jump: 'api/smf/jump',
                 select: 'api/smf/{instanceID}/transition/{actorID}/list',
                 actorUrl: 'api/smf/{instanceID}/actor/{destination}/next',
                 showUrl: 'api/smf/{instanceID}/next/{destination}',
                 cooperation: 'api/smf/{instanceID}/cooperation/{actorID}',
-                carbonID: '#txtCarbon',
-                actorID: '#txtActor',
-                //current: 'api/smf/get',
-                buttonId: '#btnOk',
+                carbonID: 'div.carbon',
+                actorID: 'div.actor',
+                buttonId: 'input.ok',
                 tips: '\u8bf7\u586b\u5199\u5ba1\u6279\u610f\u89c1',
                 selectOption: '#ddlOperate'
             });
@@ -34,13 +31,13 @@
         <div class="layui-form-item">
             <label class="layui-form-label">下一步操作</label>
             <div class="layui-input-block">
-                <select id="ddlOperate" name="to" lay-filter="ddl_operate" class="layui-select"></select>
+                <select id="ddlOperate" name="to" lay-filter="operate" class="layui-select"></select>
             </div>
         </div>
         <div class="layui-form-item" id="next_audit_user">
             <label class="layui-form-label">审批人</label>
             <div class="layui-input-block">
-                <div class="layui-input" id="txtActor" style="line-height:38px;">
+                <div class="layui-input actor" style="line-height:38px;">
                     点击选参与者
                 </div>
             </div>
@@ -48,7 +45,7 @@
         <div class="layui-form-item" id="next_audit_carbon">
             <label class="layui-form-label">抄送人</label>
             <div class="layui-input-block">
-                <div class="layui-input" id="txtCarbon" style="line-height:38px;">
+                <div class="layui-input carbon" style="line-height:38px;">
                     点击选择抄送人
                 </div>
             </div>
@@ -62,9 +59,8 @@
         <div class="layui-form-item" style="text-align:center;">
             <div id="btnGroup">
                 <input type="button"
-                       id="btnOk"
                        value="确定"
-                       class="layui-btn layui-btn-normal" />
+                       class="layui-btn layui-btn-normal ok" />
             </div>
         </div>
     </form>

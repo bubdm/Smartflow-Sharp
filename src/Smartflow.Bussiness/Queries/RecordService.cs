@@ -18,6 +18,7 @@ namespace Smartflow.Bussiness.Queries
                 session.Query<Record>()
                 .Where(r => r.InstanceID == instanceID)
                 .OrderBy(e => e.CreateTime)
+                .ThenBy(e => e.NodeID)
                 .ToList();
         }
     }
