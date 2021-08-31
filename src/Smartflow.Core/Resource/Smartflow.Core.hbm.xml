@@ -31,6 +31,7 @@
 		<property name="Veto" column="Veto" type="String" />
 		<property name="Back" column="Back" type="String"  />
 		<property name="Url" column="Url" type="String" />
+		<property name="Extra" column="Extra" type="String" />
 		<set name="Actions"  table="t_Action"  inverse="false" lazy="false"  generic="true"  cascade="all">
 			<key column="RelationshipID"/>
 			<one-to-many class="Smartflow.Core.Elements.Action,Smartflow.Core"/>

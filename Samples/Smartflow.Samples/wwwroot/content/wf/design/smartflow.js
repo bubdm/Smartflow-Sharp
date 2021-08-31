@@ -25,7 +25,8 @@
         veto: 'veto',
         back: 'back',
         url: 'url',
-        dynamic:'dynamic'
+        dynamic: 'dynamic',
+        extra:'extra'
     };
 
     Array.prototype.remove = function (dx, to) {
@@ -632,6 +633,7 @@
         node.setAttribute(config.veto, self.veto);
         node.setAttribute(config.back, self.back);
         node.setAttribute(config.url, self.url);
+        node.setAttribute(config.extra, self.extra);
 
         var attrObject = {
             group: self.group,
@@ -980,6 +982,7 @@
         this.disY = 0;
         Node.base.Constructor.call(this, "node", "node");
         this.name = "节点";
+        this.extra = "";
     }
 
     Node.extend(Shape, {
@@ -2007,6 +2010,7 @@
             type: 'array',
             id: 'value',
             name: 'value',
+            extra:'value',
             layout: 'value',
             category: 'value',
             veto: 'value',

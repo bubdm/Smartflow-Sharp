@@ -62,11 +62,12 @@ namespace Smartflow.Core
             XAttribute back = element.Attribute("back");
             XAttribute url = element.Attribute("url");
             XAttribute attr = element.Attribute("veto");
+            XAttribute extra = element.Attribute("extra");
 
             node.Veto = attr != null && attr.Value == "0" ? String.Empty : "Smartflow.Core.Components.VetoService";
             node.Back = back == null ? String.Empty : back.Value;
             node.Url = url == null ? String.Empty : url.Value;
-
+            node.Extra = extra == null ? String.Empty : extra.Value;
             string category = element.Attribute("category").Value;
             node.NodeType = Internals.Utils.Convert(category);
             if (element.HasElements)

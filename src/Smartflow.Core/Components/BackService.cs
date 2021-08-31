@@ -11,34 +11,42 @@ using System.Text;
 
 namespace Smartflow.Core.Components
 {
-    public class BackService
+    public class BackService: JumpService
     {
-        private readonly AbstractWorkflow workflowService = WorkflowGlobalServiceProvider.Resolve<AbstractWorkflow>();
+        public BackService(IWorkflowMarker marker) : base(marker)
+        {
 
+        }
+ 
         public void Back(WorkflowContext context)
         {
             WorkflowInstance instance = WorkflowInstance.GetInstance(context.InstanceID);
             Node current = instance.Current.FirstOrDefault(e => e.NID == context.NodeID);
-            Transition transition = workflowService.NodeService.GetPreviousTransition(current);
-            var to = workflowService.NodeService.GetPrevious(transition);
-            this.Invoke(transition.NID,new ExecutingContext
+            Transition transition = WorkflowService.NodeService.GetPreviousTransition(current);
+            var to = WorkflowService.NodeService.GetPrevious(transition);
+            if (instance.State == WorkflowInstanceState.Running)
             {
-                From = current,
-                To = to,
-                Direction = WorkflowOpertaion.Back,
-                InstanceID= context.InstanceID,
-                Data = context.Data,
-                Message = context.Message
-            }, context);
+                this.Invoke(transition.NID, new ExecutingContext
+                {
+                    From = current,
+                    To = to,
+                    Direction = WorkflowOpertaion.Back,
+                    InstanceID = context.InstanceID,
+                    Data = context.Data,
+                    Message = context.Message
+                }, context);
+            }
+
+            base.Invoke(new WorkflowMarkerArg(to, WorkflowOpertaion.Back, typeof(BackService).Name), () => WorkflowService.InstanceService.Transfer(WorkflowInstanceState.Hang, context.InstanceID), () =>WorkflowService.InstanceService.Transfer(WorkflowInstanceState.Running, context.InstanceID));
         }
 
         private void Invoke(string transitionID, ExecutingContext executeContext, WorkflowContext context)
         {
             string instanceID = context.InstanceID;
-            workflowService.InstanceService.Jump(executeContext.From.ID, executeContext.To.ID, instanceID, new WorkflowProcess()
+            WorkflowService.InstanceService.Jump(executeContext.From.ID, executeContext.To.ID, instanceID, new WorkflowProcess()
             {
                 RelationshipID = executeContext.From.NID,
-                CreateTime=DateTime.Now,
+                CreateTime = DateTime.Now,
                 ActorID = context.ActorID,
                 Origin = executeContext.From.ID,
                 Destination = executeContext.To.ID,
@@ -47,18 +55,18 @@ namespace Smartflow.Core.Components
                 NodeType = executeContext.From.NodeType,
                 Direction = WorkflowOpertaion.Back
 
-            }, workflowService.ProcessService);
+            }, WorkflowService.ProcessService);
 
-            workflowService.Actions.ForEach(pluin => pluin.ActionExecute(executeContext));
+            WorkflowService.Actions.ForEach(pluin => pluin.ActionExecute(executeContext));
 
             if (executeContext.To.NodeType == WorkflowNodeCategory.Decision)
             {
-                Back(new WorkflowContext()
+                this.Back(new WorkflowContext()
                 {
                     InstanceID = context.InstanceID,
                     Message = "系统流转",
                     ActorID = context.ActorID,
-                    NodeID =executeContext.To.NID
+                    NodeID = executeContext.To.NID
                 });
             }
         }

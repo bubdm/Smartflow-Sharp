@@ -22,6 +22,11 @@ namespace Smartflow.Core
         Running,
 
         /// <summary>
+        /// 挂起
+        /// </summary>
+        Hang,
+
+        /// <summary>
         /// 流程完结
         /// </summary>
         End,

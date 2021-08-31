@@ -78,5 +78,11 @@ namespace Smartflow.Core.Elements
             get;
             set;
         }
+
+        public virtual string Extra
+        {
+            get;
+            set;
+        }
     }
 }

@@ -56,6 +56,15 @@
                 return $.SMF.getNodeById(id);
             }
         },
+        node_extra: {
+            field: 'extra',
+            parse: function (id) {
+                return $.SMF.getNodeById(id);
+            },
+            invoke: function (nx) {
+                $('#node_extra').val(nx.extra);
+            }
+        },
         node_name: {
             field: 'name',
             parse: function (id) {
@@ -212,7 +221,7 @@
                 $.each(nx.rule, function () { $('#' + this.id).attr("checked", true); });
                 layui.form.render(null, $this.option.constraintID);
             });
-            var controls = ['node_veto', 'node_name', 'node_carbon','node_back_select'];
+            var controls = ['node_veto', 'node_name','node_extra', 'node_carbon','node_back_select'];
             $.each(controls, function (i, propertyName) {
                 if (Configuration.controlSelectors[propertyName].invoke) {
                     Configuration.controlSelectors[propertyName].invoke(nx, $this);

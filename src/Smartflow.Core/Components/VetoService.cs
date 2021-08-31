@@ -12,9 +12,12 @@ using Smartflow.Core.Elements;
 
 namespace Smartflow.Core.Components
 {
-    public class VetoService
+    public class VetoService:JumpService
     {
-        private readonly AbstractWorkflow workflowService = WorkflowGlobalServiceProvider.Resolve<AbstractWorkflow>();
+        public VetoService(IWorkflowMarker marker):base(marker)
+        {
+           
+        }
 
         public void Veto(WorkflowContext context)
         {
@@ -22,8 +25,8 @@ namespace Smartflow.Core.Components
             Node current = instance.Current.FirstOrDefault(e => e.NID == context.NodeID);
             if (instance.State == WorkflowInstanceState.Running)
             {
-                workflowService.InstanceService.Transfer(WorkflowInstanceState.Reject, instance.InstanceID);
-                workflowService.Actions.ForEach(pluin => pluin.ActionExecute(new ExecutingContext()
+                WorkflowService.InstanceService.Transfer(WorkflowInstanceState.Reject, instance.InstanceID);
+                WorkflowService.Actions.ForEach(pluin => pluin.ActionExecute(new ExecutingContext()
                 {
                     From = current,
                     To = current,
@@ -33,6 +36,8 @@ namespace Smartflow.Core.Components
                     Data = context.Data
                 }));
             }
+            
+            base.Invoke(new WorkflowMarkerArg(current, WorkflowOpertaion.Decide, typeof(VetoService).Name), () => WorkflowService.InstanceService.Transfer(WorkflowInstanceState.Hang,instance.InstanceID), () => WorkflowService.InstanceService.Transfer(WorkflowInstanceState.Running, instance.InstanceID));
         }
     }
 }

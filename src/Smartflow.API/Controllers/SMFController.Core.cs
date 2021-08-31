@@ -291,9 +291,8 @@ namespace Smartflow.API.Controllers
         [Route("api/smf/{categoryCode}/{instanceID}/kill/{destination}"), HttpPost]
         public void Kill(string categoryCode, string instanceID, string destination)
         {
-            WorkflowInstance instance = WorkflowInstance.GetInstance(instanceID);
             Node current = NodeService.FindNodeByID(destination, instanceID);
-            WorkflowEngine.Instance.Kill(instance, new WorkflowContext()
+            WorkflowEngine.Instance.Kill(new WorkflowContext()
             {
                 Message = "终止流程",
                 InstanceID = instanceID,

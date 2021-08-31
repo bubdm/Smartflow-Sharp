@@ -19,8 +19,17 @@ namespace Smartflow.Core
         private static readonly WorkflowEngine singleton = new WorkflowEngine();
 
         private readonly AbstractWorkflow workflowService = WorkflowGlobalServiceProvider.Resolve<AbstractWorkflow>();
+
         private WorkflowEngine()
         {
+        }
+
+        private IWorkflowCoreService CoreService
+        {
+            get
+            {
+                return new WorkflowCoreService();
+            }
         }
 
         public static WorkflowEngine Instance
@@ -43,7 +52,7 @@ namespace Smartflow.Core
         /// </summary>
         public void Veto(WorkflowContext context)
         {
-            new VetoService().Veto(context);
+            CoreService.Veto(context);
         }
 
         /// <summary>
@@ -51,7 +60,7 @@ namespace Smartflow.Core
         /// </summary>
         public void Back(WorkflowContext context)
         {
-            new BackService().Back(context);
+            CoreService.Back(context);
         }
 
         /// <summary>
@@ -59,7 +68,7 @@ namespace Smartflow.Core
         /// </summary>
         public void BackSender(WorkflowContext context)
         {
-            new BackSenderService().Back(context);
+            CoreService.Back(context);
         }
 
         /// <summary>
@@ -67,7 +76,7 @@ namespace Smartflow.Core
         /// </summary>
         public void Next(WorkflowJumpContext context)
         {
-            new JumpService().Next(context);
+            CoreService.Next(context);
         }
 
         /// <summary>
@@ -75,9 +84,9 @@ namespace Smartflow.Core
         /// </summary>
         /// <param name="instance"></param>
         /// <param name="context"></param>
-        public void Kill(WorkflowInstance instance, WorkflowContext context)
+        public void Kill(WorkflowContext context)
         {
-            new KillService().Kill(context);
+            CoreService.Kill(context);
         }
     }
 }
