@@ -28,7 +28,7 @@ namespace Smartflow.Core
         {
             get
             {
-                return new WorkflowCoreService();
+                return WorkflowGlobalServiceProvider.Resolve<IWorkflowCoreService>();
             }
         }
 

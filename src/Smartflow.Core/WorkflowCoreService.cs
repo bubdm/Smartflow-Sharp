@@ -3,11 +3,20 @@ using Smartflow.Core.Elements;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Smartflow.Core
 {
-    public class WorkflowCoreService : IWorkflowCoreService, IWorkflowMarker
+    public class WorkflowCoreService : IWorkflowCoreService, IWorkflowJumpCoreService
     {
+        protected AbstractWorkflow WorkflowService
+        {
+            get
+            {
+                return WorkflowGlobalServiceProvider.Resolve<AbstractWorkflow>();
+            }
+        }
+
         /// <summary>
         /// 否决
         /// </summary>
@@ -35,7 +44,7 @@ namespace Smartflow.Core
         /// <summary>
         /// 下一步流转
         /// </summary>
-        public void Next(WorkflowJumpContext context)
+        public void Next(WorkflowContext context)
         {
             new NextService(this).Next(context);
         }
@@ -50,10 +59,29 @@ namespace Smartflow.Core
             new KillService(this).Kill(context);
         }
 
-        public virtual void Execute(WorkflowMarkerArg marker, System.Action hang, System.Action resume)
+        public void Execute(WorkflowMarkerArg marker, WorkflowContext context)
         {
-            IWorkflowMarker workflowMarker = WorkflowGlobalServiceProvider.Resolve<IWorkflowMarker>();
-            workflowMarker?.Execute(marker, hang, resume);
+            IList<IWorkflowMarker> workflowMarkers = WorkflowGlobalServiceProvider.Query<IWorkflowMarker>();
+            foreach (IWorkflowMarker workflowMarker in workflowMarkers)
+            {
+                if (Regex.IsMatch(marker.Node.Extra, workflowMarker.Pattern) && !String.IsNullOrEmpty(workflowMarker.Pattern))
+                {
+                    workflowMarker?.Execute(marker, () => WorkflowService.InstanceService.Transfer(WorkflowInstanceState.Hang, context.InstanceID), () => Transfer(marker, context));
+                }
+            }
         }
-     }
+
+        private void Transfer(WorkflowMarkerArg marker, WorkflowContext context)
+        {
+            WorkflowService.InstanceService.Transfer(WorkflowInstanceState.Running, context.InstanceID);
+            if (String.Equals(typeof(BackSenderService).Name, marker.Command, StringComparison.OrdinalIgnoreCase))
+            {
+                Back(context);
+            }
+            else if (String.Equals(typeof(NextService).Name, marker.Command, StringComparison.OrdinalIgnoreCase))
+            {
+                Next(context);
+            }
+        }
+    }
 }

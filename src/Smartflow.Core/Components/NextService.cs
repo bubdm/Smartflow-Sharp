@@ -13,12 +13,12 @@ namespace Smartflow.Core.Components
 {
     public class NextService: JumpService
     {
-        public NextService(IWorkflowMarker marker) : base(marker)
+        public NextService(IWorkflowJumpCoreService coreService) : base(coreService)
         {
 
         }
 
-        public void Next(WorkflowJumpContext context)
+        public void Next(WorkflowContext context)
         {
             WorkflowInstance instance = WorkflowInstance.GetInstance(context.InstanceID);
             Node current = instance.Current.FirstOrDefault(e => e.NID == context.NodeID);
@@ -36,7 +36,7 @@ namespace Smartflow.Core.Components
             }, context);
         }
 
-        private void Next(WorkflowJumpContext context, Transition transition)
+        private void Next(WorkflowContext context, Transition transition)
         {
             WorkflowInstance instance = WorkflowInstance.GetInstance(context.InstanceID);
             IList<Node> nodes = WorkflowService.NodeService.Query(instance.InstanceID);
@@ -53,7 +53,7 @@ namespace Smartflow.Core.Components
             }, context);
         }
 
-        private void Invoke(Transition selectTransition, ExecutingContext executeContext, WorkflowJumpContext context)
+        private void Invoke(Transition selectTransition, ExecutingContext executeContext, WorkflowContext context)
         {
             WorkflowInstance instance = WorkflowInstance.GetInstance(context.InstanceID);
             if (instance.State == WorkflowInstanceState.Running)
@@ -127,7 +127,7 @@ namespace Smartflow.Core.Components
                 }
             }
 
-            base.Invoke(new WorkflowMarkerArg(executeContext.To, WorkflowOpertaion.Go, typeof(NextService).Name), () => WorkflowService.InstanceService.Transfer(WorkflowInstanceState.Hang, instance.InstanceID), () => WorkflowService.InstanceService.Transfer(WorkflowInstanceState.Running, instance.InstanceID));
+            base.Invoke(new WorkflowMarkerArg(executeContext.To, WorkflowOpertaion.Go, typeof(NextService).Name),context);
         }
     }
 }

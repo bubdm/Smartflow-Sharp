@@ -28,6 +28,7 @@ namespace Smartflow.Core
             _globalTypeCollection.Add(typeof(ScriptActionService));
             _globalTypeCollection.Add(typeof(WorkflowTransitionService));
             _globalTypeCollection.Add(typeof(WorkflowLinkService));
+            _globalTypeCollection.Add(typeof(WorkflowCoreService));
         }
 
         public static void RegisterGlobalService(Type registerType)

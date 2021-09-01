@@ -14,7 +14,7 @@ namespace Smartflow.Core.Components
 {
     public class BackSenderService: JumpService
     {
-        public BackSenderService(IWorkflowMarker marker):base(marker)
+        public BackSenderService(IWorkflowJumpCoreService coreService) :base(coreService)
         {
 
         }
@@ -37,7 +37,7 @@ namespace Smartflow.Core.Components
                     Message = context.Message
                 }, context);
                 current = to;
-                base.Invoke(new WorkflowMarkerArg(to, WorkflowOpertaion.Back, typeof(BackSenderService).Name), () =>WorkflowService.InstanceService.Transfer(WorkflowInstanceState.Hang, instance.InstanceID), () =>WorkflowService.InstanceService.Transfer(WorkflowInstanceState.Running, instance.InstanceID));
+                base.Invoke(new WorkflowMarkerArg(to, WorkflowOpertaion.Back, typeof(BackSenderService).Name), context);
             }
         }
 

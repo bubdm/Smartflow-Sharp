@@ -14,7 +14,7 @@ namespace Smartflow.Core.Components
 {
     public class VetoService:JumpService
     {
-        public VetoService(IWorkflowMarker marker):base(marker)
+        public VetoService(IWorkflowJumpCoreService coreService) :base(coreService)
         {
            
         }
@@ -37,7 +37,7 @@ namespace Smartflow.Core.Components
                 }));
             }
             
-            base.Invoke(new WorkflowMarkerArg(current, WorkflowOpertaion.Decide, typeof(VetoService).Name), () => WorkflowService.InstanceService.Transfer(WorkflowInstanceState.Hang,instance.InstanceID), () => WorkflowService.InstanceService.Transfer(WorkflowInstanceState.Running, instance.InstanceID));
+            base.Invoke(new WorkflowMarkerArg(current, WorkflowOpertaion.Decide, typeof(VetoService).Name),context);
         }
     }
 }

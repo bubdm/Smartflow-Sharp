@@ -15,7 +15,7 @@ namespace Smartflow.Core.Components
     {
         private readonly AbstractWorkflow workflowService = WorkflowGlobalServiceProvider.Resolve<AbstractWorkflow>();
 
-        public KillService(IWorkflowMarker marker):base(marker)
+        public KillService(IWorkflowJumpCoreService coreService) :base(coreService)
         {
           
         }
@@ -37,7 +37,7 @@ namespace Smartflow.Core.Components
                     Data = context.Data
                 }));
             }
-            base.Invoke(new WorkflowMarkerArg(current, WorkflowOpertaion.Decide, typeof(KillService).Name), () => workflowService.InstanceService.Transfer(WorkflowInstanceState.Hang, instance.InstanceID), () => workflowService.InstanceService.Transfer(WorkflowInstanceState.Running, instance.InstanceID));
+            base.Invoke(new WorkflowMarkerArg(current, WorkflowOpertaion.Decide, typeof(KillService).Name),context);
         }
     }
 }

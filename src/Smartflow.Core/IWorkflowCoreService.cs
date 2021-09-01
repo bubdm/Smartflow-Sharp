@@ -12,7 +12,7 @@ namespace Smartflow.Core
 
         void Veto(WorkflowContext context);
 
-        void Next(WorkflowJumpContext context);
+        void Next(WorkflowContext context);
 
         void Kill(WorkflowContext context);
     }

@@ -18,20 +18,20 @@ namespace Smartflow.Core.Components
         /// <summary>
         /// 工作流标记(类似书签)
         /// </summary>
-        protected IWorkflowMarker Marker
+        protected IWorkflowJumpCoreService CoreService
         {
             get;
             set;
         }
 
-        protected JumpService(IWorkflowMarker marker)
+        protected JumpService(IWorkflowJumpCoreService coreService)
         {
-            this.Marker = marker;
+            this.CoreService = coreService;
         }
 
-        protected virtual void Invoke(WorkflowMarkerArg arg, Action hang, Action resume)
+        protected virtual void Invoke(WorkflowMarkerArg arg,WorkflowContext context)
         {
-            Marker?.Execute(arg, hang, resume);
+            CoreService?.Execute(arg, context);
         }
     }
 }
