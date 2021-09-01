@@ -3,37 +3,33 @@
  Home page: http://www.smartflow-sharp.com
  ********************************************************************
  */
-; (function (initialize) {
+(function (initialize) {
 
-    function Form(option) {
+    function Frame(option) {
         this.option = option;
     }
 
-    Form.prototype.load = function (nx) {
+    Frame.prototype.load = function (nx) {
         var $opt = this.option;
-        var form = layui.form;
-        form.val($opt.el, {
-            name: nx.name,
-            url: nx.url
+       // setTimeout(function () {
+            $($opt.el).each(function () {
+                $(this).context.contentWindow.setting.load(nx);
+            });
+       // }, 1000);
+    }
+    Frame.prototype.set = function (nx) {
+        var $opt = this.option;
+        $($opt.el).each(function () {
+            $(this).context.contentWindow.setting.set(nx);
         });
     }
 
-    Form.prototype.set = function (nx) {
-        var $opt = this.option;
-        var form = layui.form.val($opt.el);
-        nx.name = form.name;
-        nx.url = form.url;
-        if (nx.brush) {
-            nx.brush.text(nx.name);
-        }
-    }
-
     initialize(function (option) {
-        return new Form(option);
+        return new Frame(option);
     });
 
 })(function (createInstance) {
     window.setting = createInstance({
-        el: 'form-bus'
+        el: 'iframe'
     });
 });

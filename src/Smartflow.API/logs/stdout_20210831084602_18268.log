@@ -1,0 +1,121 @@
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: D:\workplace\Smartflow.Sharp\src\Smartflow.API
+NHibernate: 
+    SELECT
+        count(*) as y0_ 
+    FROM
+        v_supervise this_
+NHibernate: 
+    SELECT
+        this_.InstanceID as instanceid1_22_0_,
+        this_.CategoryName as categoryname2_22_0_,
+        this_.CategoryCode as categorycode3_22_0_,
+        this_.Comment as comment4_22_0_,
+        this_.[Key] as Key5_22_0_,
+        this_.NodeName as nodename6_22_0_,
+        this_.NodeID as nodeid7_22_0_,
+        this_.[State] as State8_22_0_,
+        this_.Name as name9_22_0_,
+        this_.OrganizationName as organizationname10_22_0_,
+        this_.Creator as creator11_22_0_,
+        this_.CreateTime as createtime12_22_0_ 
+    FROM
+        v_supervise this_ 
+    ORDER BY
+        this_.CreateTime desc
+NHibernate: 
+    SELECT
+        TOP (@p0) this_.InstanceID as instanceid1_22_0_,
+        this_.CategoryName as categoryname2_22_0_,
+        this_.CategoryCode as categorycode3_22_0_,
+        this_.Comment as comment4_22_0_,
+        this_.[Key] as Key5_22_0_,
+        this_.NodeName as nodename6_22_0_,
+        this_.NodeID as nodeid7_22_0_,
+        this_.[State] as State8_22_0_,
+        this_.Name as name9_22_0_,
+        this_.OrganizationName as organizationname10_22_0_,
+        this_.Creator as creator11_22_0_,
+        this_.CreateTime as createtime12_22_0_ 
+    FROM
+        v_supervise this_ 
+    ORDER BY
+        this_.CreateTime desc;
+    @p0 = 10 [Type: Int32 (0:0:0)]
+NHibernate: 
+    SELECT
+        count(*) as y0_ 
+    FROM
+        t_structure this_
+NHibernate: 
+    SELECT
+        TOP (@p0) this_.NID as nid1_23_0_,
+        this_.Name as name2_23_0_,
+        this_.CategoryCode as categorycode3_23_0_,
+        this_.CategoryName as categoryname4_23_0_,
+        this_.Resource as resource5_23_0_,
+        this_.Status as status6_23_0_,
+        this_.CreateTime as createtime7_23_0_,
+        this_.Memo as memo8_23_0_ 
+    FROM
+        t_structure this_;
+    @p0 = 10 [Type: Int32 (0:0:0)]
+NHibernate: 
+    select
+        category0_.NID as nid1_15_,
+        category0_.Name as name2_15_,
+        category0_.Url as url3_15_,
+        category0_.ParentID as parentid4_15_ 
+    from
+        t_category category0_
+NHibernate: 
+    SELECT
+        workflowst0_.NID as nid1_23_0_,
+        workflowst0_.Name as name2_23_0_,
+        workflowst0_.CategoryCode as categorycode3_23_0_,
+        workflowst0_.CategoryName as categoryname4_23_0_,
+        workflowst0_.Resource as resource5_23_0_,
+        workflowst0_.Status as status6_23_0_,
+        workflowst0_.CreateTime as createtime7_23_0_,
+        workflowst0_.Memo as memo8_23_0_ 
+    FROM
+        t_structure workflowst0_ 
+    WHERE
+        workflowst0_.NID=@p0;
+    @p0 = 'E18D2E9F-94A0-4E01-ABAB-C39B8196E7FD' [Type: String (4000:0:0)]
+NHibernate: 
+    SELECT
+        workflowst0_.NID as nid1_23_0_,
+        workflowst0_.Name as name2_23_0_,
+        workflowst0_.CategoryCode as categorycode3_23_0_,
+        workflowst0_.CategoryName as categoryname4_23_0_,
+        workflowst0_.Resource as resource5_23_0_,
+        workflowst0_.Status as status6_23_0_,
+        workflowst0_.CreateTime as createtime7_23_0_,
+        workflowst0_.Memo as memo8_23_0_ 
+    FROM
+        t_structure workflowst0_ 
+    WHERE
+        workflowst0_.NID=@p0;
+    @p0 = 'E18D2E9F-94A0-4E01-ABAB-C39B8196E7FD' [Type: String (4000:0:0)]
+NHibernate: 
+    select
+        workflowst0_.NID as nid1_23_,
+        workflowst0_.Name as name2_23_,
+        workflowst0_.CategoryCode as categorycode3_23_,
+        workflowst0_.CategoryName as categoryname4_23_,
+        workflowst0_.Resource as resource5_23_,
+        workflowst0_.Status as status6_23_,
+        workflowst0_.CreateTime as createtime7_23_,
+        workflowst0_.Memo as memo8_23_ 
+    from
+        t_structure workflowst0_ 
+    order by
+        workflowst0_.CreateTime desc
+NHibernate: 
+    SELECT
+        c

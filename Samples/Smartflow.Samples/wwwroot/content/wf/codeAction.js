@@ -3,13 +3,17 @@
  Home page: http://www.smartflow-sharp.com
  ********************************************************************
  */
-;(function () {
+; (function (initialize) {
 
+    function Action(option) {
+        this.option = option;
+    }
 
-    function loadAction(nx) {
-        var ajaxSettings = { url: 'api/setting/action/list', type: 'get' };
+    Action.prototype.load = function (nx) {
+        var $this = this,
+            ajaxSettings = { url: $this.option.url, type: 'get' };
+
         ajaxSettings.data = ajaxSettings.data || {};
-
         ajaxSettings.success = function (serverData) {
 
             var leftDataSource = [], rightDataSource = [];
@@ -22,7 +26,7 @@
                     checked: ''
                 });
             });
-            
+
             $.each(nx.action, function () {
                 rightDataSource.push(this.id);
             });
@@ -44,8 +48,7 @@
         util.ajaxWFService(ajaxSettings);
     }
 
-    function setAction(nx) {
-
+    Action.prototype.set = function (nx) {
         var transfer = layui.transfer,
             rightData = transfer.getData('rightGroup');
 
@@ -62,9 +65,12 @@
         nx.action = actionArray;
     }
 
-    window.setting = {
-        load: loadAction,
-        set: setAction
-    };
+    initialize(function (option) {
+        return new Action(option);
+    });
 
-})();
+})(function (createInstance) {
+    window.setting = createInstance({
+        url: 'api/setting/action/list'
+    });
+});

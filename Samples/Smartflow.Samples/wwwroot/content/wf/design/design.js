@@ -3,7 +3,7 @@
  Home page: http://www.smartflow-sharp.com
  ********************************************************************
  */
-(function () {
+(function (initialize) {
 
     Configuration.controlSelectors = {
         node_veto: {
@@ -22,7 +22,6 @@
                 return $.SMF.getNodeById(id);
             },
             invoke: function (nx) {
-                //$("#node_back_select").val(nx.back);
                 layui.form.val('form_node',{ node_back_select: nx.back });
             }
         },
@@ -41,7 +40,7 @@
             type: 'box',
             width: '900px',
             height: '680px',
-            url: './carbonSelect.html',
+            url: './userSelect.html',
             parse: function (id) {
                 return $.SMF.getNodeById(id);
             }
@@ -202,9 +201,13 @@
                 $(selector).keyup(function () {
                     var result = Configuration.findElementById.call($this, this);
                     var text = $(this).val();
-                    result.element.name = text;
-                    if (result.element.brush) {
-                        result.element.brush.text(text);
+                    if (result.descriptor.field === "extra") {
+                        result.element.extra = text;
+                    } else {
+                        result.element.name = text;
+                        if (result.element.brush) {
+                            result.element.brush.text(text);
+                        }
                     }
                 });
             }
@@ -442,8 +445,12 @@
         }
     }
 
-    window.design = {
-        Configuration: Configuration
-    };
+    initialize(function (option) {
+        return new Configuration(option);
+    });
 
-})();
+})(function (createInstance) {
+    window.design = {
+        Configuration: createInstance
+    };
+});

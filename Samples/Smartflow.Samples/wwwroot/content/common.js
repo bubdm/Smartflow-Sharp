@@ -1,11 +1,11 @@
 ﻿(function () {
     window.util = {
-        prefix: 'http://localhost:8083/',
-        smf: 'http://localhost:26260/',
-        process: 'http://localhost:8083/wf/image.html?id=',
-        pending: 'http://localhost:8083/wf/pending.html?id=',
-        actor: 'http://localhost:8083/wf/actorSelect.html',
-        carbon: 'http://localhost:8083/wf/carbonSelect.html',
+        prefix: 'http://localhost:59095/',
+        smf: 'http://localhost:8097/',
+        process: 'http://localhost:59095/wf/image.html?id=',
+        pending: 'http://localhost:59095/wf/pending.html?id=',
+        actor: 'http://localhost:59095/wf/actorSelect.html',
+        carbon: 'http://localhost:59095/wf/userSelect.html',
         ajaxService: function (settings) {
             var url = util.prefix + settings.url;
             var defaultSettings = $.extend({

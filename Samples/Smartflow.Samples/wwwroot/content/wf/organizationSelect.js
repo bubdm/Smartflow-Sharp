@@ -3,22 +3,18 @@
  Home page: http://www.smartflow-sharp.com
  ********************************************************************
  */
-(function (factory) {
+(function (initialize) {
 
-    function loadTree(nx) {
-        var ajaxSettings = { url: 'api/setting/organization/list', type: 'get' };
+    function Tree(option) {
+        this.option = option;
+    }
+
+    Tree.prototype.load = function (nx) {
+        var $opt = this.option;
+        var ajaxSettings = { url: $opt.url, type: 'get' };
         ajaxSettings.data = ajaxSettings.data || {};
-
         ajaxSettings.success = function (serverData) {
-
-
-            var treeObj = $.fn.zTree.init($("#ztree"), {
-                callback: {
-                    onClick: function (event, treeId, node) {
-                        $("#tree").val(node.Name);
-                        $("#node-value").val(node.ID);
-                    }
-                },
+            var treeObj = $.fn.zTree.init($($opt.el), {
                 check: {
                     enable: true
                 },
@@ -38,16 +34,14 @@
             treeObj.expandAll(true);
 
             $.each(nx.organization, function () {
-                //rightDataSource.push(this.id);
                 var node = treeObj.getNodeByParam("ID", this.id, null);
                 treeObj.checkNode(node, true, true);
             });
         };
-
         util.ajaxWFService(ajaxSettings);
     }
 
-    function setTree(nx) {
+    Tree.prototype.set = function (nx) {
         var treeObj = $.fn.zTree.getZTreeObj("ztree");
         var nodes = treeObj.getCheckedNodes(true);
         var selectNodes = [];
@@ -56,15 +50,16 @@
                 selectNodes.push({ id: this.ID, name: this.Name });
             }
         });
-
         nx.organization = selectNodes;
     }
 
-    factory({
-        load: loadTree,
-        set: setTree
+    initialize(function (option) {
+        return new Tree(option);
     });
 
-})(function (option) {
-    window.setting = option;
+})(function (createInstance) {
+    window.setting = createInstance({
+        url: 'api/setting/organization/list',
+        el: '#ztree'
+    });
 });

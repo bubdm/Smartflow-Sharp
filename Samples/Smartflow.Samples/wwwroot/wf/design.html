@@ -155,7 +155,7 @@
     <script src="../content/wf/design/design.js"></script>
     <script type="text/javascript">
         $(function () {
-            var setting = new design.Configuration({
+            var setting =design.Configuration({
                 node: 'workflow-node',
                 help:'workflow-help',
                 container: 'drawing',
@@ -166,7 +166,6 @@
                 constraintID: 'form_rule',
                 constraintUrl: 'api/setting/constraint/list'
             });
-
             $("#menus li").click(function () {
                 var command = $(this).attr("command");
                 var instance = $.SMF.getComponentById('drawing');

@@ -3,7 +3,7 @@
  Home page: http://www.smartflow-sharp.com
  ********************************************************************
  */
-(function (factory) {
+(function (initialize) {
 
     function Record(option) {
         this.setting = $.extend({}, option);
@@ -60,7 +60,7 @@
         layui.table.reload(this.setting.config.id);
     };
 
-    factory(function (option) {
+    initialize(function (option) {
         return new Record(option);
     });
 

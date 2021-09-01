@@ -3,48 +3,56 @@
  Home page: http://www.smartflow-sharp.com
  ********************************************************************
  */
-; (function (factory) {
+; (function (initialize) {
 
-    function loadAction(nx) {
+    function EasyAction(option) {
+        this.option = option;
+    }
 
-
-        var form = layui.form;
-        loadDataSource(function () {
+    EasyAction.prototype.load = function (nx) {
+        var $opt = this.option,
+            form = layui.form;
+        this.loadDataSource(function () {
             if (nx.command) {
-                $("#node_normal_select").val(nx.command.id);
+                $($opt.selectEl).val(nx.command.id);
                 form.render('select');
-                $("#node_normal_script").val(nx.command.text);
             }
         });
     }
 
-    function loadDataSource(callback) {
+    EasyAction.prototype.loadDataSource = function (callback) {
+        var $opt = this.option;
         util.ajaxWFService({
-            url: 'api/setting/database-source/list',
+            url: $opt.url,
             type: 'get',
             success: function (serverData) {
                 var htmlArray = [];
-
                 htmlArray.push("<option value=\"\"></option>");
                 $.each(serverData, function () {
                     htmlArray.push("<option value='" + this.ID + "'>" + this.Name + "</option>");
                 });
 
-                $('#node_normal_select').html(htmlArray.join(''));
-                layui.form.render(null, 'form_normal');
+                $($opt.selectEl).html(htmlArray.join(''));
+                layui.form.render('select');
                 callback && callback();
             }
         });
     }
 
-    factory({
-        load: loadAction,
-        set: function (nx) {
-            var form = layui.form.val('form_normal');
-            nx.command = $.extend(nx.command || {}, form);
-        }
+    EasyAction.prototype.set = function (nx) {
+        var $opt = this.option, form = layui.form.val($opt.el);
+
+        nx.command = $.extend(nx.command || {}, form);
+    }
+
+    initialize(function (option) {
+        return new EasyAction(option);
     });
 
-})(function (option) {
-    window.setting = option;
+})(function (createInstance) {
+    window.setting = createInstance({
+        el: 'form_normal',
+        selectEl:'#node_normal_select',
+        url: 'api/setting/database-source/list',
+    });
 });

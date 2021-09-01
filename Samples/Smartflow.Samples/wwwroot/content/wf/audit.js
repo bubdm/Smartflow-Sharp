@@ -1,4 +1,4 @@
-﻿(function (factory) {
+﻿(function (initialize) {
 
     function Audit(option) {
         this.user = util.getUser();
@@ -89,7 +89,7 @@
         });
     }
 
-    factory(function (option) {
+    initialize(function (option) {
         return new Audit(option);
     });
 

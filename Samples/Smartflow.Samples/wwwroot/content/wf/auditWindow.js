@@ -1,4 +1,4 @@
-﻿(function (factory) {
+﻿(function (initialize) {
 
     function AuditWindow(option) {
         var $this = this;
@@ -232,7 +232,7 @@
         return data.join(',');
     }
 
-    factory(function (option) {
+    initialize(function (option) {
         return new AuditWindow(option);
     });
 

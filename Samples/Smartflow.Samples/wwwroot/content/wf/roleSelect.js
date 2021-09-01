@@ -3,10 +3,15 @@
  Home page: http://www.smartflow-sharp.com
  ********************************************************************
  */
-; (function (factory) {
+; (function (initialize) {
 
-    function loadGroup(nx) {
-        var ajaxSettings = { url: 'api/setting/group/list', type: 'get' };
+    function Transfer(option) {
+        this.option = option;
+    }
+
+    Transfer.prototype.load = function (nx) {
+        var $opt = this.option;
+        var ajaxSettings = { url: $opt.url, type: 'get' };
         ajaxSettings.data = ajaxSettings.data || {};
 
         ajaxSettings.success = function (serverData) {
@@ -30,21 +35,20 @@
 
             //基础效果
             transfer.render({
-                elem: '#transfer'
+                elem: $opt.el
                 , title: ['待选择', '已选择']
                 , data: leftDataSource
                 , value: rightDataSource
                 , height: 530
                 , width: 391
-                , id: 'rightGroup'
+                , id: $opt.right
             });
         };
 
         util.ajaxWFService(ajaxSettings);
     }
 
-    function setGroup(nx) {
-
+    Transfer.prototype.set = function (nx) {
         var transfer = layui.transfer,
             rightData = transfer.getData('rightGroup');
 
@@ -61,11 +65,14 @@
         nx.group = roleArray;
     }
 
-    factory({
-        load: loadGroup,
-        set: setGroup
+    initialize(function (option) {
+        return new Transfer(option);
     });
 
-})(function (option) {
-    window.setting = option;
+})(function (createInstance) {
+    window.setting = createInstance({
+        url:'api/setting/group/list',
+        el: '#transfer',
+        right:'rightGroup'
+    });
 });
