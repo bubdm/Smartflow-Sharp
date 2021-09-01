@@ -168,6 +168,7 @@
             toLeft: function (o) {
                 var $this = $(o),
                     $opt = this.option,
+                    code = $("input.node-value").val(),
                     key = $("input.input-key").val();
                 if (!$this.hasClass('layui-btn-disabled')) {
                     var checkStatus = layui.table.checkStatus($opt.right.filter);
@@ -183,7 +184,7 @@
                             var config = {
                                 page: { curr: 1 },
                                 where: {
-                                    arg: JSON.stringify({ actor: actors.join(','), searchKey: key })
+                                    arg: JSON.stringify({ actor: actors.join(','), orgCode: code, searchKey: key })
                                 }
                             };
                             layui.table.reload($opt.left.filter, config);
@@ -231,25 +232,35 @@
             toRight: function (o) {
                 var $this = $(o),
                     $opt = this.option,
+                    code = $("input.node-value").val(),
                     key = $("input.input-key").val();
                 if (!$this.hasClass('layui-btn-disabled')) {
-                    var checkStatus = layui.table.checkStatus($opt.left.filter), data = checkStatus.data;
+                    var checkStatus = layui.table.checkStatus($opt.left.filter);
                     if (checkStatus.data.length > 0) {
-                        $.each(checkStatus.data, function () {
-                            actors.push(this.ID);
-                        });
                         addPending(checkStatus.data, function () {
+                            layui.table.reload($opt.right.filter, { page: false });
+                            var actors = [], cacheData = layui.table.cache.right;
+                            $.each(cacheData, function () {
+                                actors.push(this.ID);
+                            });
+                            $.each(checkStatus.data, function () {
+                                actors.push(this.ID);
+                            });
                             var config = {
                                 page: { curr: 1 },
-                                where: { arg: JSON.stringify({ searchKey: key, actor: actors.join(',') }) }
+                                where: {
+                                    arg: JSON.stringify({
+                                        searchKey: key,
+                                        orgCode: code,
+                                        actor: actors.join(',')
+                                    })
+                                }
                             };
                             layui.table.reload($opt.left.filter, config);
-                            layui.table.reload($opt.right.filter, { page: false });
                         });
                     }
                     $this.addClass('layui-btn-disabled');
                 }
-
                 function addPending(data, callback) {
                     var actors = [];
                     $.each(data, function () {
@@ -285,7 +296,7 @@
                 var searchCondition = {
                     actor: actors.join(','),
                     orgCode: code,
-                    searchKey: code
+                    searchKey: key
                 };
 
                 $('div.arrow-right').addClass('layui-btn-disabled');

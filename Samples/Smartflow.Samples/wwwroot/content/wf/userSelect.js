@@ -205,7 +205,7 @@
                     $opt = this.option,
                     key = $("input.input-key").val();
                 if (!$this.hasClass('layui-btn-disabled')) {
-                    var checkStatus = layui.table.checkStatus($opt.left.filter), data = checkStatus.data;
+                    var checkStatus = layui.table.checkStatus($opt.left.filter);
                     if (checkStatus.data.length > 0) {
                         var cacheData = layui.table.cache.right;
                         var carbons = [];
