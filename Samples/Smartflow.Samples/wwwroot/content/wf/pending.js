@@ -3,7 +3,7 @@
  Home page: http://www.smartflow-sharp.com
  ********************************************************************
  */
-$(function () {
+(function (initialize) {
 
     function Page(option) {
         this.userID = util.doQuery("id");
@@ -12,31 +12,26 @@ $(function () {
     }
 
     Page.prototype.bind = function () {
-        var $this = this;
+        var $this = this,
+            form = layui.form;
         $.each($this.setting.event, function (propertyName) {
             var selector = '#' + propertyName;
             $(selector).click(function () {
                 $this.setting.event[propertyName].call($this);
             });
         });
-    }
-
-    Page.prototype.init = function () {
-        var form = layui.form;
-        form.render('radio', 'form-center-search');
-        this.bind();
-        this.bindButtonGroup();
-        this.loadTask(this.userID);
-        $("#form-center-search input[type=radio]:eq(0)").next('.layui-form-radio').trigger('click');
-    }
-    Page.prototype.bindButtonGroup = function () {
-        var $this = this;
-        var form = layui.form;
         form.on('radio', function (data) {
             $this.load(data.value, $this.userID);
         });
     }
-
+    Page.prototype.init = function () {
+        var form = layui.form;
+        form.render('radio', 'form-center-search');
+        this.bind();
+        this.loadTask(this.userID);
+        $("#form-center-search input[type=radio]:eq(0)").next('.layui-form-radio').trigger('click');
+    }
+  
     Page.prototype.delete = function (data) {
         var $this = this,
             config = $this.setting.config,
@@ -101,7 +96,6 @@ $(function () {
 
     Page.prototype.jump = function (obj) {
         var config = this.setting.config;
-
         util.ajaxWFService({
             url: util.format(config.category, { id: obj.CategoryCode }),
             type: 'get',
@@ -180,11 +174,17 @@ $(function () {
         }
     }
 
-    var page = new Page({
+    initialize(function (option) {
+        return new Page(option);
+    });
+
+})(function (createInstance) {
+
+    var page = createInstance({
         config: {
             id: 'pending-table',
             task: 'task-table',
-            toolbar:'#task-list-bar',
+            toolbar: '#task-list-bar',
             delete: 'api/setting/summary/{instanceID}/{categoryCode}/delete/{id}',
             url: 'api/setting/summary/query/page',
             category: 'api/setting/category/{id}/info'
@@ -204,7 +204,7 @@ $(function () {
             }
         },
         event: {
-   
+
         }
     });
 
@@ -212,4 +212,5 @@ $(function () {
     window.invoke = function () {
         page.refresh();
     }
+
 });

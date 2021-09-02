@@ -3,17 +3,24 @@
  Home page: http://www.smartflow-sharp.com
  ********************************************************************
  */
-$(function () {
+(function (initialize) {
 
     function Page(option) {
-        this.setting = $.extend({}, option);
+        this.setting = option;
         this.init();
     }
 
     Page.prototype.init = function () {
+        var $this = this;
         this.bind();
-        this.load();
-        this.loadCategory();
+        this.renderTable();
+        util.ajaxWFService({
+            url: $this.setting.config.select.url,
+            type: 'GET',
+            success: function (serverData) {
+                $this.renderTree(serverData);
+            }
+        });
     }
 
     Page.prototype.bind = function () {
@@ -25,14 +32,13 @@ $(function () {
             });
         });
     }
-
-    Page.prototype.load = function () {
+    Page.prototype.renderTable = function () {
         var $this = this;
         var config = this.setting.config;
         var selector = '#' + config.id;
         util.table({
             elem: selector
-            ,toolbar:'#list-bar'
+            , toolbar: '#list-bar'
             , url: config.url
             , cols: [[
                 { type: 'radio' }
@@ -51,13 +57,12 @@ $(function () {
             util.ajaxWFService({
                 type: 'post',
                 url: url,
-                dataType:'text',
+                dataType: 'text',
                 success: function () {
                     layui.table.reload(config.id);
                 }
             });
         });
-
         layui.table.on('toolbar(' + config.id + ')', function (obj) {
             var data = obj.data;
             var eventName = obj.event;
@@ -65,46 +70,27 @@ $(function () {
         });
     }
 
-    Page.prototype.loadCategory = function () {
-        var url = this.setting.config.categoryUrl,
-            id = '#' + this.setting.config.categoryId;
-        util.ajaxWFService({
-            url: url,
-            type: 'GET',
-            success: function (serverData) {
-                var treeObj = $.fn.zTree.init($(id), {
-                    callback: {
-                        beforeClick: function (id, node) {
-                            return !node.isParent;
-                        },
-                        onClick: function (event, id, node) {
-                            $("#hidCategoryCode").val(node.NID);
-                            $("#txtCategoryName").val(node.Name);
-                        },
-                        onDblClick: function () {
-                            $("#hidCategoryCode").val(node.NID);
-                            $("#txtCategoryName").val(node.Name);
-                            $("#zc").hide();
-                        }
-                    },
-                    data: {
-                        key: {
-                            name: 'Name'
-                        },
-                        simpleData: {
-                            enable: true,
-                            idKey: 'NID',
-                            pIdKey: 'ParentID',
-                            rootPId: 0
-                        }
-                    }
-                }, serverData);
-                var nodes = treeObj.getNodesByFilter(function (node) { return node.level == 0; });
-                if (nodes.length > 0) {
-                    treeObj.expandNode(nodes[0]);
+    Page.prototype.renderTree = function (serverData) {
+        var $this = this;
+        var id = '#' + $this.setting.config.select.selector
+        var treeObj = $.fn.zTree.init($(id), {
+            callback: $this.setting.config.tree.callback,
+            data: {
+                key: {
+                    name: 'Name'
+                },
+                simpleData: {
+                    enable: true,
+                    idKey: 'NID',
+                    pIdKey: 'ParentID',
+                    rootPId: 0
                 }
             }
-        });
+        }, serverData);
+        var nodes = treeObj.getNodesByFilter(function (node) { return node.level == 0; });
+        if (nodes.length > 0) {
+            treeObj.expandNode(nodes[0]);
+        }
     }
 
     Page.prototype.refresh = function () {
@@ -117,7 +103,7 @@ $(function () {
 
     Page.prototype.delete = function (id) {
         var $this = this;
-        var url = util.format(this.setting.config.delete, { id: id});
+        var url = util.format(this.setting.config.delete, { id: id });
         util.ajaxWFService({
             url: url,
             dataType: 'text',
@@ -145,17 +131,39 @@ $(function () {
         window.open(url, '流程设计器', "width=" + w + ", height=" + h + ",top=0,left=0,titlebar=no,menubar=no,scrollbars=yes,resizable=yes,status=yes,toolbar=no,location=no");
     }
 
-    var page = new Page({
+    initialize(function (option) {
+        return new Page(option);
+    });
+})(function (createInstance) {
+    var page = createInstance({
         config: {
             id: 'struct-table',
             url: 'api/setting/structure/query/page',
             templet: {
                 checkbox: '#struct-col-checkbox'
             },
-            checkbox: 'checkbox(form-status)', 
+            checkbox: 'checkbox(form-status)',
             delete: 'api/setting/structure/{id}/delete',
-            categoryUrl: 'api/setting/category/list',
-            categoryId: 'ztree'
+            select: {
+                url: 'api/setting/category/list',
+                selector: 'ztree'
+            },
+            tree: {
+                callback: {
+                    beforeClick: function (id, node) {
+                        return !node.isParent;
+                    },
+                    onClick: function (event, id, node) {
+                        $("#hidCategoryCode").val(node.NID);
+                        $("#txtCategoryName").val(node.Name);
+                    },
+                    onDblClick: function () {
+                        $("#hidCategoryCode").val(node.NID);
+                        $("#txtCategoryName").val(node.Name);
+                        $("#zc").hide();
+                    }
+                }
+            }
         },
         methods: {
             add: function () {
@@ -187,8 +195,7 @@ $(function () {
                 this.search(config);
             }
         }
-    });
-
+    })
     window.invoke = function () {
         page.refresh();
     }
