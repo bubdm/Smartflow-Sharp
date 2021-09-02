@@ -2,25 +2,15 @@
 
     function Audit(option) {
         this.user = util.getUser();
-        this.setting = $.extend({
-            url: 'api/smf/{instanceID}/node/{actorID}',
-            bridge: 'api/setting/bridge/{id}/info'
-        }, option);
-
-        var $this = this;
-        this.init(this.setting.key, function (s) {
-            $this.setting.key = s.Key;
-            $this.setting.code = s.CategoryCode;
-            $this.setting.instanceID = s.InstanceID;
-            $this.setCurrent();
-            $this.bind();
-        });
+        this.setting = option;
+        this.bridge = {};
+        this.init();
     }
 
     Audit.prototype.openAuditWindow = function () {
         var $this = this,
             setting = $this.setting,
-            url = util.format($this.setting.url, { instanceID: setting.instanceID, actorID: $this.user.ID });
+            url = util.format($this.setting.url, { instanceID: $this.bridge.instanceID, actorID: $this.user.ID });
         util.ajaxWFService({
             type: 'get',
             url: url,
@@ -32,9 +22,9 @@
                     width: 600,
                     height: 420
                 }), {
-                    code: setting.code,
-                    instanceID: setting.instanceID,
-                    id: setting.key
+                    code: $this.bridge.code,
+                    instanceID: $this.bridge.instanceID,
+                    id: $this.bridge.id
                 });
             }
         });
@@ -43,16 +33,15 @@
     Audit.prototype.setCurrent = function () {
         var $this = this,
             setting = $this.setting,
-            url = util.format($this.setting.url, { instanceID: setting.instanceID, actorID: $this.user.ID });
+            url = util.format($this.setting.url, { instanceID: $this.bridge.instanceID, actorID: $this.user.ID });
         util.ajaxWFService({
             type: 'get',
             url: url,
             success: function (serverData) {
                 var button = setting.button;
                 $(button).val(serverData.Name);
-                setting.name = serverData.Name;
                 if (serverData.Category.toLowerCase() == 'end') {
-                    $(setting.button).hide();
+                    $(button).hide();
                 } else {
                     if (!serverData.HasAuth) {
                         $(button)
@@ -64,14 +53,19 @@
         });
     };
 
-    Audit.prototype.init = function (id, callback) {
-        var $this = this;
-        var url = util.format($this.setting.bridge, { id: id });
+    Audit.prototype.init = function () {
+        var $this = this, url = util.format($this.setting.bridge, { id: this.setting.key });
         util.ajaxWFService({
             type: 'get',
             url: url,
             success: function (s) {
-                callback && callback(s);
+                $this.bridge = Object.create({
+                    id: s.Key,
+                    code: s.CategoryCode,
+                    instanceID: s.InstanceID
+                });
+                $this.setCurrent();
+                $this.bind();
             }
         });
     }
@@ -84,7 +78,7 @@
         });
 
         $(setting.image).click(function () {
-            var url = util.process + setting.instanceID;
+            var url = util.process + $this.bridge.instanceID;
             util.openWin(url, '流程图', window.screen.availWidth - 100, window.screen.availHeight - 160);
         });
     }
@@ -93,7 +87,15 @@
         return new Audit(option);
     });
 
-})(function (instance) {
-    $.Audit = instance;
+})(function (createInstance) {
+    $.Audit = function (option) {
+
+        var settting = {
+            url: 'api/smf/{instanceID}/node/{actorID}',
+            bridge: 'api/setting/bridge/{id}/info'
+        };
+
+        return createInstance(Object.assign(option, settting));
+    }
 });
 

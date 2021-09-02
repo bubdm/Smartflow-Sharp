@@ -1,9 +1,6 @@
 ﻿(function (initialize) {
 
     function AuditWindow(option) {
-        var $this = this;
-        var instanceID = util.doQuery("instanceID");
-        var code = util.doQuery('code');
         this.back = "NID_BACK_ID_80_11";
         this.sender = "NID_BACK_ID_80_12";
         this.veto = "NID_REJECT_ID_80_11";
@@ -15,13 +12,14 @@
             carbon: []
         };
         this.ActorIndex = 0;
-        this.settings = $.extend({
-            instanceID: instanceID,
-            code: code
-        }, option);
-        $.each(['_bindSelect', '_initEvent'], function (index, propertyName) {
-            $this[propertyName]();
-        });
+        this.settings = option;
+        this.init();
+    }
+
+    AuditWindow.prototype.init = function () {
+        var $this = this;
+        $this._bindSelect();
+        $this._initEvent();
     }
 
     AuditWindow.prototype.close = function () {
@@ -236,7 +234,14 @@
         return new AuditWindow(option);
     });
 
-})(function (instance) {
-    $.AuditWindow = instance;
+})(function (createInstance) {
+    $.AuditWindow = function (option) {
+        var instanceID = util.doQuery("instanceID");
+        var code = util.doQuery('code');
+        return createInstance(Object.assign(option, {
+            instanceID: instanceID,
+            code: code
+        }));
+    }
 });
 

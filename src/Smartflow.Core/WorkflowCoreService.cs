@@ -7,13 +7,16 @@ using System.Text.RegularExpressions;
 
 namespace Smartflow.Core
 {
-    public class WorkflowCoreService : IWorkflowCoreService, IWorkflowJumpCoreService
+    public class WorkflowCoreService : IWorkflowBasicCoreService, IWorkflowCoreService, IWorkflowMarkerCoreService
     {
-        protected AbstractWorkflow WorkflowService
+        /// <summary>
+        /// 抽象工作流的服务
+        /// </summary>
+        protected IWorkflowInstanceService InstanceService
         {
             get
             {
-                return WorkflowGlobalServiceProvider.Resolve<AbstractWorkflow>();
+                return WorkflowGlobalServiceProvider.Resolve<IWorkflowInstanceService>();
             }
         }
 
@@ -59,21 +62,31 @@ namespace Smartflow.Core
             new KillService(this).Kill(context);
         }
 
-        public void Execute(WorkflowMarkerArg marker, WorkflowContext context)
+        /// <summary>
+        /// 书签功能，通过实现IWorkflowMarker 接口，控制流程实例动态的改变
+        /// </summary>
+        /// <param name="marker">参数</param>
+        /// <param name="context">上下文</param>
+        public void Execute(WorkflowMarkerArgs marker, WorkflowContext context)
         {
             IList<IWorkflowMarker> workflowMarkers = WorkflowGlobalServiceProvider.Query<IWorkflowMarker>();
             foreach (IWorkflowMarker workflowMarker in workflowMarkers)
             {
                 if (Regex.IsMatch(marker.Node.Extra, workflowMarker.Pattern) && !String.IsNullOrEmpty(workflowMarker.Pattern))
                 {
-                    workflowMarker?.Execute(marker, () => WorkflowService.InstanceService.Transfer(WorkflowInstanceState.Hang, context.InstanceID), () => Transfer(marker, context));
+                    workflowMarker?.Execute(marker, () => InstanceService.Transfer(WorkflowInstanceState.Hang, context.InstanceID), () => Transfer(marker, context));
                 }
             }
         }
 
-        private void Transfer(WorkflowMarkerArg marker, WorkflowContext context)
+        /// <summary>
+        /// 内部状态的转移。对流程实例恢复到正常的状态后，执行相应的流转操作
+        /// </summary>
+        /// <param name="marker"></param>
+        /// <param name="context"></param>
+        private void Transfer(WorkflowMarkerArgs marker, WorkflowContext context)
         {
-            WorkflowService.InstanceService.Transfer(WorkflowInstanceState.Running, context.InstanceID);
+            InstanceService.Transfer(WorkflowInstanceState.Running, context.InstanceID);
             if (String.Equals(typeof(BackSenderService).Name, marker.Command, StringComparison.OrdinalIgnoreCase))
             {
                 Back(context);
@@ -82,6 +95,18 @@ namespace Smartflow.Core
             {
                 Next(context);
             }
+        }
+
+        /// <summary>
+        /// 鉴定流转人是否拥有节点的流转权限
+        /// </summary>
+        /// <param name="node">节点信息</param>
+        /// <returns>true|fale</returns>
+        public Boolean Authentication(Node node)
+        {
+            IWorkflowAuthenticationService workflowAuthenticationService =WorkflowGlobalServiceProvider.Resolve<IWorkflowAuthenticationService>();
+            if (workflowAuthenticationService == null||node.NodeType== WorkflowNodeCategory.Decision || node.NodeType == WorkflowNodeCategory.Fork || node.NodeType == WorkflowNodeCategory.Merge || node.NodeType == WorkflowNodeCategory.Start) return true;
+            return workflowAuthenticationService.Authentication(node);
         }
     }
 }

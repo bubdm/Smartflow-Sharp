@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Smartflow.Core
 {
-    public class WorkflowMarkerArg:System.EventArgs
+    public class WorkflowMarkerArgs:System.EventArgs
     {
         public Node Node
         {
@@ -21,8 +21,7 @@ namespace Smartflow.Core
         {
             get; private set;
         }
-
-        public WorkflowMarkerArg(Node node, WorkflowOpertaion direction,string command)
+   public WorkflowMarkerArgs(Node node, WorkflowOpertaion direction,string command)
         {
             this.Node = node;
             this.Direction = direction;

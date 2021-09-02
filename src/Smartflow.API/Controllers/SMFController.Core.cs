@@ -37,6 +37,7 @@ namespace Smartflow.API.Controllers
                 return WorkflowGlobalServiceProvider.Resolve<AbstractWorkflow>().NodeService;
             }
         }
+
         public SMFController(IWorkflowStructureService workflowStructureService, IPendingService pendingService, IBridgeService bridgeService, IActorService actorService, IMapper mapper)
         {
             _pendingService = pendingService;
@@ -246,45 +247,6 @@ namespace Smartflow.API.Controllers
                 current.FirstOrDefault();
         }
 
-        private string GetAuditNext(Node current, string categoryCode, string creator, string name)
-        {
-            string instanceID = current.InstanceID;
-            Transition transitionSelect = current.Transitions.FirstOrDefault();
-            Node node = NodeService.FindNodeByID(transitionSelect.Destination, instanceID);
-            List<string> groupIDs = new List<string>();
-            List<string> actorIDs = new List<string>();
-            List<string> carbonIDs = new List<string>();
-            List<string> organizationIDs = new List<string>();
-
-            foreach (Group g in node.Groups)
-            {
-                groupIDs.Add(g.ID.ToString());
-            }
-            foreach (Carbon c in node.Carbons)
-            {
-                carbonIDs.Add(c.ID.ToString());
-            }
-            foreach (Actor item in node.Actors)
-            {
-                actorIDs.Add(item.ID);
-            }
-            foreach (Smartflow.Core.Elements.Organization item in node.Organizations)
-            {
-                organizationIDs.Add(item.ID);
-            }
-
-            return Newtonsoft.Json.JsonConvert.SerializeObject(new
-            {
-                CategoryCode = categoryCode,
-                UUID = creator,
-                Name = name,
-                Group = string.Join(",", groupIDs),
-                Actor = string.Join(",", actorIDs),
-                Carbon = string.Join(",", carbonIDs),
-                Organization = string.Join(",", organizationIDs)
-            });
-        }
-
         /// <summary>
         /// 跳转
         /// </summary>
@@ -360,6 +322,46 @@ namespace Smartflow.API.Controllers
                 Organization = current.Organizations,
                 Carbon = current.Carbons
             };
+        }
+
+
+        private string GetAuditNext(Node current, string categoryCode, string creator, string name)
+        {
+            string instanceID = current.InstanceID;
+            Transition transitionSelect = current.Transitions.FirstOrDefault();
+            Node node = NodeService.FindNodeByID(transitionSelect.Destination, instanceID);
+            List<string> groupIDs = new List<string>();
+            List<string> actorIDs = new List<string>();
+            List<string> carbonIDs = new List<string>();
+            List<string> organizationIDs = new List<string>();
+
+            foreach (Group g in node.Groups)
+            {
+                groupIDs.Add(g.ID.ToString());
+            }
+            foreach (Carbon c in node.Carbons)
+            {
+                carbonIDs.Add(c.ID.ToString());
+            }
+            foreach (Actor item in node.Actors)
+            {
+                actorIDs.Add(item.ID);
+            }
+            foreach (Smartflow.Core.Elements.Organization item in node.Organizations)
+            {
+                organizationIDs.Add(item.ID);
+            }
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(new
+            {
+                CategoryCode = categoryCode,
+                UUID = creator,
+                Name = name,
+                Group = string.Join(",", groupIDs),
+                Actor = string.Join(",", actorIDs),
+                Carbon = string.Join(",", carbonIDs),
+                Organization = string.Join(",", organizationIDs)
+            });
         }
     }
 }

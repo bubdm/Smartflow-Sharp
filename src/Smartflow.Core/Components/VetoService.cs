@@ -14,7 +14,7 @@ namespace Smartflow.Core.Components
 {
     public class VetoService:JumpService
     {
-        public VetoService(IWorkflowJumpCoreService coreService) :base(coreService)
+        public VetoService(IWorkflowBasicCoreService coreService) :base(coreService)
         {
            
         }
@@ -23,6 +23,7 @@ namespace Smartflow.Core.Components
         {
             WorkflowInstance instance = WorkflowInstance.GetInstance(context.InstanceID);
             Node current = instance.Current.FirstOrDefault(e => e.NID == context.NodeID);
+            if (!base.Authentication(current)) return;
             if (instance.State == WorkflowInstanceState.Running)
             {
                 WorkflowService.InstanceService.Transfer(WorkflowInstanceState.Reject, instance.InstanceID);
@@ -36,8 +37,7 @@ namespace Smartflow.Core.Components
                     Data = context.Data
                 }));
             }
-            
-            base.Invoke(new WorkflowMarkerArg(current, WorkflowOpertaion.Decide, typeof(VetoService).Name),context);
+            base.Invoke(new WorkflowMarkerArgs(current, WorkflowOpertaion.Decide, typeof(VetoService).Name),context);
         }
     }
 }

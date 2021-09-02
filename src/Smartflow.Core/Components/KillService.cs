@@ -15,7 +15,7 @@ namespace Smartflow.Core.Components
     {
         private readonly AbstractWorkflow workflowService = WorkflowGlobalServiceProvider.Resolve<AbstractWorkflow>();
 
-        public KillService(IWorkflowJumpCoreService coreService) :base(coreService)
+        public KillService(IWorkflowBasicCoreService coreService) :base(coreService)
         {
           
         }
@@ -37,7 +37,7 @@ namespace Smartflow.Core.Components
                     Data = context.Data
                 }));
             }
-            base.Invoke(new WorkflowMarkerArg(current, WorkflowOpertaion.Decide, typeof(KillService).Name),context);
+            base.Invoke(new WorkflowMarkerArgs(current, WorkflowOpertaion.Decide, typeof(KillService).Name),context);
         }
     }
 }

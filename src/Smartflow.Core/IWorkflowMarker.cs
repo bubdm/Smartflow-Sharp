@@ -17,6 +17,6 @@ namespace Smartflow.Core
         /// <param name="marker"></param>
         /// <param name="hang"></param>
         /// <param name="resume"></param>
-        void Execute(WorkflowMarkerArg marker, Action hang, Action resume);
+        void Execute(WorkflowMarkerArgs marker, Action hang, Action resume);
     }
 }

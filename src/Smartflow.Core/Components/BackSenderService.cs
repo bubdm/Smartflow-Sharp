@@ -14,7 +14,7 @@ namespace Smartflow.Core.Components
 {
     public class BackSenderService: JumpService
     {
-        public BackSenderService(IWorkflowJumpCoreService coreService) :base(coreService)
+        public BackSenderService(IWorkflowBasicCoreService coreService) :base(coreService)
         {
 
         }
@@ -23,6 +23,7 @@ namespace Smartflow.Core.Components
         {
             WorkflowInstance instance = WorkflowInstance.GetInstance(context.InstanceID);
             Node current = instance.Current.FirstOrDefault(e => e.NID == context.NodeID);
+            if (!base.Authentication(current)) return;
             while (current.NodeType != WorkflowNodeCategory.Start&&instance.State== WorkflowInstanceState.Running)
             {
                 Transition transition = base.WorkflowService.NodeService.GetPreviousTransition(current);
@@ -37,7 +38,7 @@ namespace Smartflow.Core.Components
                     Message = context.Message
                 }, context);
                 current = to;
-                base.Invoke(new WorkflowMarkerArg(to, WorkflowOpertaion.Back, typeof(BackSenderService).Name), context);
+                base.Invoke(new WorkflowMarkerArgs(to, WorkflowOpertaion.Back, typeof(BackSenderService).Name), context);
             }
         }
 

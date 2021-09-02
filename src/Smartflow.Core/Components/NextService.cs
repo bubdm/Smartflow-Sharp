@@ -13,7 +13,7 @@ namespace Smartflow.Core.Components
 {
     public class NextService: JumpService
     {
-        public NextService(IWorkflowJumpCoreService coreService) : base(coreService)
+        public NextService(IWorkflowBasicCoreService coreService) : base(coreService)
         {
 
         }
@@ -22,6 +22,7 @@ namespace Smartflow.Core.Components
         {
             WorkflowInstance instance = WorkflowInstance.GetInstance(context.InstanceID);
             Node current = instance.Current.FirstOrDefault(e => e.NID == context.NodeID);
+            if (!base.Authentication(current)) return;
             Transition transition = current.Transitions.FirstOrDefault();
             IList<Node> nodes = WorkflowService.NodeService.Query(instance.InstanceID);
             Node to = nodes.FirstOrDefault(e => e.ID == transition.Destination);
@@ -127,7 +128,7 @@ namespace Smartflow.Core.Components
                 }
             }
 
-            base.Invoke(new WorkflowMarkerArg(executeContext.To, WorkflowOpertaion.Go, typeof(NextService).Name),context);
+            base.Invoke(new WorkflowMarkerArgs(executeContext.To, WorkflowOpertaion.Go, typeof(NextService).Name),context);
         }
     }
 }

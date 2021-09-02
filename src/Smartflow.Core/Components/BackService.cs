@@ -13,7 +13,7 @@ namespace Smartflow.Core.Components
 {
     public class BackService: JumpService
     {
-        public BackService(IWorkflowJumpCoreService coreService) : base(coreService)
+        public BackService(IWorkflowBasicCoreService coreService) : base(coreService)
         {
 
         }
@@ -21,7 +21,8 @@ namespace Smartflow.Core.Components
         public void Back(WorkflowContext context)
         {
             WorkflowInstance instance = WorkflowInstance.GetInstance(context.InstanceID);
-            Node current = instance.Current.FirstOrDefault(e => e.NID == context.NodeID);
+            Node current = instance.Current.FirstOrDefault(e => e.NID == context.NodeID); 
+            if (!base.Authentication(current)) return;
             Transition transition = WorkflowService.NodeService.GetPreviousTransition(current);
             var to = WorkflowService.NodeService.GetPrevious(transition);
             if (instance.State == WorkflowInstanceState.Running)
@@ -37,7 +38,7 @@ namespace Smartflow.Core.Components
                 }, context);
             }
 
-            base.Invoke(new WorkflowMarkerArg(to, WorkflowOpertaion.Back, typeof(BackService).Name),context);
+            base.Invoke(new WorkflowMarkerArgs(to, WorkflowOpertaion.Back, typeof(BackService).Name),context);
         }
 
         private void Invoke(string transitionID, ExecutingContext executeContext, WorkflowContext context)
