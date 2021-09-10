@@ -40,3 +40,4 @@ docs/docs.html
 .vs/Smartflow.Core/DesignTimeBuild/.dtbcache.v2
 /Samples/Smartflow.Samples/logs
 /Samples/Smartflow.Samples/Models/Order.cs
+/src/Smartflow.API/logs

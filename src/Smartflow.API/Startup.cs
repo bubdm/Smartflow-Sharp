@@ -12,6 +12,8 @@ using NHibernate.NetCore;
 using Smartflow.Common;
 using Smartflow.API.Code;
 using Smartflow.API.Profile;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 namespace Smartflow.API
 {
@@ -27,6 +29,18 @@ namespace Smartflow.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // 添加Swagger
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Smartflow.API", Version = "v1" });
+                // 获取xml文件名
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                // 获取xml文件路径
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                // 添加控制器层注释，true表示显示控制器注释
+                c.IncludeXmlComments(xmlPath, true);
+            });
+
             services.AddControllers(e =>
             {
                 e.Filters.Add(typeof(ApiControllerException));
@@ -47,7 +61,7 @@ namespace Smartflow.API
             WorkflowGlobalService.RegisterService();
             services.AddAutoMapper((mapper) => mapper.AddProfile(typeof(SmartflowProfile)));
             XmlConfigurator.Configure(LogManager.CreateRepository(GlobalObjectService.Configuration.GetSection("Logging:Program").Value), new FileInfo("log4net.config"));
-            services.AddHibernate(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"hibernate.cfg.xml"));
+            services.AddHibernate(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "hibernate.cfg.xml"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -63,6 +77,12 @@ namespace Smartflow.API
                 cors.AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader();
+            });
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Smartflow.API");
             });
 
             app.UseRouting();
