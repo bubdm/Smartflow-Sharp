@@ -159,15 +159,14 @@
                 url: url,
                 type: 'Get',
                 success: function (serverData) {
-                    $.SMF.getComponentById($this.option.container)
-                        .import(serverData.Resource);
+                    var instance = $.SMF.getInstanceComponent();
+                    instance.import(serverData.Resource);
                 }
             });
         } else {
             $.each(['start', 'end'], function (i, value) {
-                $.SMF
-                    .getComponentById($this.option.container)
-                    .create(value, false);
+                var instance = $.SMF.getInstanceComponent();
+                instance.create(value, false);
             });
         }
 
@@ -437,7 +436,7 @@
     }
 
     Configuration.prototype.save = function () {
-        var instance = $.SMF.getComponentById(this.option.container);
+        var instance = $.SMF.getInstanceComponent();
         if (instance.validate()) {
             this.prompt('smartflow_s_info', instance);
         } else {

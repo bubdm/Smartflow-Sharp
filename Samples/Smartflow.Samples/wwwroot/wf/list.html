@@ -14,20 +14,28 @@
     <div class="layui-container layui-table-container p10">
         <blockquote class="layui-elem-quote">
             <form class="layui-form" lay-filter="form-search">
-                <div class="layui-inline" style="position:relative;">
-                    <div class="layui-input-inline layui-input-icon" onclick="$('#zc').show()">
-                        <i class="layui-icon layui-icon-triangle-d"></i>
-                        <input type="text" id="txtCategoryName" class="layui-input" readonly placeholder="按类别筛选" />
-                    </div>
-                    <input type="hidden" id="hidCategoryCode" name="CategoryCode" />
-                    <div class="ztree-container" id="zc" onmouseleave="$('#zc').hide()">
-                        <div class="ztree" id="ztree"></div>
-                    </div>
-                </div>
-                <div class="layui-inline">
-                    <div class="layui-input-inline layui-input-icon">
-                        <i class="layui-icon layui-icon-search" id="search"></i>
-                        <input type="text" name="Key" class="layui-input" placeholder="按流程名称模糊查询" />
+                <div class="layui-form-item">
+                    <div class="layui-row">
+                        <div class="layui-col-md4">
+                            <label class="layui-form-label">业务类型</label>
+                            <div class="layui-input-block" style="position:relative;">
+                                <input type="text" id="txtCategoryName" class="layui-input" onclick="$('#zc').show()" readonly placeholder="按类别筛选" />
+                                <input type="text" id="hidCategoryCode" name="CategoryCode"  style="display:none;"/>
+                                <div class="ztree-container" id="zc" onmouseleave="$('#zc').hide()">
+                                    <div class="ztree" id="ztree"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-md4">
+                            <label class="layui-form-label">关键字</label>
+                            <div class="layui-input-block" style="position:relative;">
+                                <input type="text" name="Key" class="layui-input" placeholder="按流程名称模糊查询" />
+                            </div>
+                        </div>
+                        <div class="layui-col-md4" style="text-align:right;">
+                            <button type="button" class="layui-btn" id="search" title="查询"><i class="layui-icon layui-icon-search"></i>查询</button>
+                            <button type="reset" class="layui-btn" id="reset" title="重置"><i class="layui-icon layui-icon-fonts-clear"></i>重置</button>
+                        </div>
                     </div>
                 </div>
             </form>

@@ -33,7 +33,7 @@
                     type: 'get',
                     url: util.format("api/setting/process/{instanceID}/list",{ instanceID: id }),
                     success: function (serverData) {
-                        var instance = $.SMF.getComponentById('drawing');
+                        var instance = $.SMF.getInstanceComponent();
                         instance.import(serverData.structure, serverData.link, serverData.record);
                     }
                 });

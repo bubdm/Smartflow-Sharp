@@ -168,7 +168,7 @@
             });
             $("#menus li").click(function () {
                 var command = $(this).attr("command");
-                var instance = $.SMF.getComponentById('drawing');
+                var instance = $.SMF.getInstanceComponent();
                 if ($.inArray(command, ['node', 'decision', 'form', 'fork', 'merge','dynamic']) > -1) {
                     instance.create(command);
                 } else {

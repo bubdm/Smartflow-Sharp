@@ -22,7 +22,6 @@
             }
         });
     }
-
     Page.prototype.bind = function () {
         var $this = this;
         $.each($this.setting.event, function (propertyName) {
@@ -69,7 +68,6 @@
             $this.setting.methods[eventName].call($this);
         });
     }
-
     Page.prototype.renderTree = function (serverData) {
         var $this = this;
         var id = '#' + $this.setting.config.select.selector
@@ -94,9 +92,15 @@
     }
 
     Page.prototype.refresh = function () {
-        layui.table.reload(this.setting.config.id);
+        var searchCondition = layui.form.val('form-search');
+        var config = {
+            page: { curr: 1 },
+            where: {
+                arg: JSON.stringify(searchCondition)
+            }
+        }
+        this.search(config);
     }
-
     Page.prototype.search = function (searchCondition) {
         layui.table.reload(this.setting.config.id, searchCondition);
     }
@@ -114,8 +118,7 @@
             }
         });
     }
-
-    Page.check = function (id, callback) {
+    Page.prototype.check = function (id, callback) {
         var checkStatus = layui.table.checkStatus(id);
         var dataArray = checkStatus.data;
         if (dataArray.length == 0) {
@@ -124,13 +127,11 @@
             callback && callback(dataArray[0]);
         }
     }
-
-    Page.open = function (url) {
+    Page.prototype.open = function (url) {
         var h = window.screen.availHeight;
         var w = window.screen.availWidth;
         window.open(url, '流程设计器', "width=" + w + ", height=" + h + ",top=0,left=0,titlebar=no,menubar=no,scrollbars=yes,resizable=yes,status=yes,toolbar=no,location=no");
     }
-
     initialize(function (option) {
         return new Page(option);
     });
@@ -167,16 +168,17 @@
         },
         methods: {
             add: function () {
-                Page.open('./design.html');
+                this.open('./design.html');
             },
             edit: function () {
-                Page.check('struct-table', function (data) {
-                    Page.open('./design.html?id=' + data.NID);
+                var $this = this;
+                $this.check('struct-table', function (data) {
+                    $this.open('./design.html?id=' + data.NID);
                 });
             },
             delete: function () {
                 var $this = this;
-                Page.check('struct-table', function (data) {
+                $this.check('struct-table', function (data) {
                     util.confirm(util.message.delete, function () {
                         $this.delete(data.NID);
                     });

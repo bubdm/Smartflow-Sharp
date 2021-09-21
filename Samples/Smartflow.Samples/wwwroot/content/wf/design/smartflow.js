@@ -4,7 +4,7 @@
  *Version:   4.0
  ********************************************************************
  */
-(function ($) {
+ (function (initialize) {
 
     var config = {
         root: 'workflow',
@@ -75,7 +75,6 @@
             }
         }
     }
-
     Draw.removeById = function (id) {
         for (var i = 0, len = Draw._proto_RC.length; i < len; i++) {
             if (Draw._proto_RC[i].id == id) {
@@ -208,7 +207,6 @@
 
         return false;
     }
-
     Draw.prototype._join = function (evt) {
         if (this._shared) {
             this._shared.x2 = Draw.getClientX(evt);
@@ -240,7 +238,6 @@
             oy1: first.y - from.y()
         });
     }
-
     Draw.prototype.join = function () {
         var self = this;
         this._initEvent();
@@ -370,7 +367,6 @@
     Draw.prototype.serialize = function (doc) {
         return this.support ? doc.xml : new XMLSerializer().serializeToString(doc);
     }
-
     Draw.prototype.export = function () {
         var unique = 31,
             nodeCollection = [],
@@ -398,7 +394,6 @@
         });
         return encodeURI(this.serialize(doc));
     }
-
     Draw.prototype.validate = function () {
         var validateCollection = [];
 
@@ -411,7 +406,6 @@
 
         return !(validateCollection.length > 0 || Draw._proto_RC.length === 0);
     }
-
     Draw.prototype.import = function (structure, links, record) {
         var dwInstance = this,
             root = new XML(structure, dwInstance.support).root;
@@ -2161,14 +2155,18 @@
         workflow.nodes = nodeArray;
     };
 
-    $.fn.SMF = function (option) {
-        var id = $(this).attr("id");
-        Draw._proto_Cc[id] = new Draw(option);
-    }
+    initialize(function (option) {
+        Draw._proto_Cc = new Draw(option);
+        return Draw._proto_Cc;
+    }, Draw);
 
+})(function (factory,Draw) {
+    $.fn.SMF = function (option) {
+        return factory(option)
+    }
     $.SMF = {
-        getComponentById: function (id) {
-            return Draw._proto_Cc[id];
+        getInstanceComponent: function () {
+            return Draw._proto_Cc;
         },
         getNodeById: function (id) {
             return Draw._proto_NC[id];
@@ -2177,5 +2175,4 @@
             return Draw._proto_LC[id];
         }
     }
-
-})(jQuery);
+})
