@@ -160,7 +160,9 @@ namespace Smartflow.API.Controllers
         /// <summary>
         /// 重新发起流程
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="instanceID">实例ID</param>
+        /// <param name="categoryCode">类别编码</param>
+        /// <param name="id">业务ID</param>
         [Route("api/smf/{instanceID}/{categoryCode}/reboot/{id}"), HttpPost]
         public void Reboot(string instanceID, string categoryCode, string id)
         {
@@ -189,7 +191,8 @@ namespace Smartflow.API.Controllers
         /// <summary>
         /// 获取当前节点信息
         /// </summary>
-        /// <param name="id">实例ID</param>
+        /// <param name="instanceID">实例ID</param>
+        /// <param name="actorID">参与人ID</param>
         /// <returns></returns>
 
         [Route("api/smf/{instanceID}/node/{actorID}"), HttpGet]

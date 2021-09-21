@@ -26,8 +26,8 @@ namespace Smartflow.Core.Components
             if (!base.Authentication(current)) return;
             if (instance.State == WorkflowInstanceState.Running)
             {
-                WorkflowService.InstanceService.Transfer(WorkflowInstanceState.Reject, instance.InstanceID);
-                WorkflowService.Actions.ForEach(pluin => pluin.ActionExecute(new ExecutingContext()
+                AbsWorkflowService.InstanceService.Transfer(WorkflowInstanceState.Reject, instance.InstanceID);
+                base.DoPluginAction(new ExecutingContext()
                 {
                     From = current,
                     To = current,
@@ -35,7 +35,7 @@ namespace Smartflow.Core.Components
                     Message = context.Message,
                     Direction = WorkflowOpertaion.Decide,
                     Data = context.Data
-                }));
+                });
             }
             base.Invoke(new WorkflowMarkerArgs(current, WorkflowOpertaion.Decide, typeof(VetoService).Name),context);
         }

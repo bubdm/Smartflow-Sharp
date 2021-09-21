@@ -17,10 +17,21 @@ namespace Smartflow.Core
     public interface IWorkflowBasicCoreService : IWorkflowMarkerCoreService
     {
         /// <summary>
+        /// 抽象工作流的服务
+        /// </summary>
+        AbstractWorkflow AbsWorkflowService { get; }
+       
+        /// <summary>
         ///  鉴定流转人是否拥有节点的流转权限
         /// </summary>
         /// <param name="node">当前节点</param>
         /// <returns>true|false</returns>
         Boolean Authentication(Node node);
+
+        /// <summary>
+        ///  执行自定义动作
+        /// </summary>
+        /// <param name="context">执行上下文</param>
+        void DoPluginAction(ExecutingContext context);
     }
 }

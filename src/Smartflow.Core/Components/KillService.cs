@@ -20,7 +20,6 @@ namespace Smartflow.Core.Components
           
         }
 
-
         public void Kill(WorkflowContext context)
         {
             WorkflowInstance instance = WorkflowInstance.GetInstance(context.InstanceID);
@@ -28,15 +27,16 @@ namespace Smartflow.Core.Components
             if (instance.State == WorkflowInstanceState.Running)
             {
                 workflowService.InstanceService.Transfer(WorkflowInstanceState.Kill, instance.InstanceID);
-                workflowService.Actions.ForEach(pluin => pluin.ActionExecute(new ExecutingContext()
+                base.DoPluginAction(new ExecutingContext()
                 {
                     From = current,
                     To = current,
                     InstanceID = instance.InstanceID,
                     Message = "终止流程",
                     Data = context.Data
-                }));
+                });
             }
+
             base.Invoke(new WorkflowMarkerArgs(current, WorkflowOpertaion.Decide, typeof(KillService).Name),context);
         }
     }

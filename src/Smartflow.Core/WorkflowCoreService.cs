@@ -12,13 +12,7 @@ namespace Smartflow.Core
         /// <summary>
         /// 抽象工作流的服务
         /// </summary>
-        protected IWorkflowInstanceService InstanceService
-        {
-            get
-            {
-                return WorkflowGlobalServiceProvider.Resolve<IWorkflowInstanceService>();
-            }
-        }
+        public AbstractWorkflow AbsWorkflowService => WorkflowGlobalServiceProvider.Resolve<AbstractWorkflow>();
 
         /// <summary>
         /// 否决
@@ -74,7 +68,7 @@ namespace Smartflow.Core
             {
                 if (Regex.IsMatch(marker.Node.Extra, workflowMarker.Pattern) && !String.IsNullOrEmpty(workflowMarker.Pattern))
                 {
-                    workflowMarker?.Execute(marker, () => InstanceService.Transfer(WorkflowInstanceState.Hang, context.InstanceID), () => Transfer(marker, context));
+                    workflowMarker?.Execute(marker, () => AbsWorkflowService.InstanceService.Transfer(WorkflowInstanceState.Hang, context.InstanceID), () => Transfer(marker, context));
                 }
             }
         }
@@ -86,7 +80,7 @@ namespace Smartflow.Core
         /// <param name="context"></param>
         private void Transfer(WorkflowMarkerArgs marker, WorkflowContext context)
         {
-            InstanceService.Transfer(WorkflowInstanceState.Running, context.InstanceID);
+            AbsWorkflowService.InstanceService.Transfer(WorkflowInstanceState.Running, context.InstanceID);
             if (String.Equals(typeof(BackSenderService).Name, marker.Command, StringComparison.OrdinalIgnoreCase))
             {
                 Back(context);
@@ -104,9 +98,18 @@ namespace Smartflow.Core
         /// <returns>true|fale</returns>
         public Boolean Authentication(Node node)
         {
-            IWorkflowAuthenticationService workflowAuthenticationService =WorkflowGlobalServiceProvider.Resolve<IWorkflowAuthenticationService>();
-            if (workflowAuthenticationService == null||node.NodeType== WorkflowNodeCategory.Decision || node.NodeType == WorkflowNodeCategory.Fork || node.NodeType == WorkflowNodeCategory.Merge || node.NodeType == WorkflowNodeCategory.Start) return true;
+            IWorkflowAuthenticationService workflowAuthenticationService = WorkflowGlobalServiceProvider.Resolve<IWorkflowAuthenticationService>();
+            if (workflowAuthenticationService == null || node.NodeType == WorkflowNodeCategory.Decision || node.NodeType == WorkflowNodeCategory.Fork || node.NodeType == WorkflowNodeCategory.Merge || node.NodeType == WorkflowNodeCategory.Start) return true;
             return workflowAuthenticationService.Authentication(node);
+        }
+
+        /// <summary>
+        ///  执行自定义动作
+        /// </summary>
+        /// <param name="context">执行上下文</param>
+        public void DoPluginAction(ExecutingContext context)
+        {
+            AbsWorkflowService.Actions.ForEach(pluin => pluin.ActionExecute(context));
         }
     }
 }

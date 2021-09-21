@@ -26,8 +26,8 @@ namespace Smartflow.Core.Components
             if (!base.Authentication(current)) return;
             while (current.NodeType != WorkflowNodeCategory.Start&&instance.State== WorkflowInstanceState.Running)
             {
-                Transition transition = base.WorkflowService.NodeService.GetPreviousTransition(current);
-                var to = base.WorkflowService.NodeService.GetPrevious(transition);
+                Transition transition = AbsWorkflowService.NodeService.GetPreviousTransition(current);
+                var to = base.AbsWorkflowService.NodeService.GetPrevious(transition);
                 this.Invoke(transition.NID, new ExecutingContext
                 {
                     From = current,
@@ -45,7 +45,7 @@ namespace Smartflow.Core.Components
         private void Invoke(string transitionID, ExecutingContext executeContext, WorkflowContext context)
         {
             string instanceID = context.InstanceID;
-            WorkflowService.InstanceService.Jump(executeContext.From.ID, executeContext.To.ID, instanceID, new WorkflowProcess()
+            AbsWorkflowService.InstanceService.Jump(executeContext.From.ID, executeContext.To.ID, instanceID, new WorkflowProcess()
             {
                 RelationshipID = executeContext.From.NID,
                 CreateTime = DateTime.Now,
@@ -56,10 +56,11 @@ namespace Smartflow.Core.Components
                 InstanceID = executeContext.InstanceID,
                 NodeType = executeContext.From.NodeType,
                 Direction = WorkflowOpertaion.Back
-            }, WorkflowService.ProcessService);
+            }, AbsWorkflowService.ProcessService);
 
-            WorkflowService.Actions.ForEach(pluin => pluin.ActionExecute(executeContext));
 
+            base.DoPluginAction(executeContext);
+           
             if (executeContext.To.NodeType == WorkflowNodeCategory.Decision)
             {
                 this.Sender(new WorkflowContext()

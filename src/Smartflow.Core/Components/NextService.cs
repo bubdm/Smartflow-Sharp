@@ -24,7 +24,7 @@ namespace Smartflow.Core.Components
             Node current = instance.Current.FirstOrDefault(e => e.NID == context.NodeID);
             if (!base.Authentication(current)) return;
             Transition transition = current.Transitions.FirstOrDefault();
-            IList<Node> nodes = WorkflowService.NodeService.Query(instance.InstanceID);
+            IList<Node> nodes = AbsWorkflowService.NodeService.Query(instance.InstanceID);
             Node to = nodes.FirstOrDefault(e => e.ID == transition.Destination);
             this.Invoke(transition, new ExecutingContext
             {
@@ -40,7 +40,7 @@ namespace Smartflow.Core.Components
         private void Next(WorkflowContext context, Transition transition)
         {
             WorkflowInstance instance = WorkflowInstance.GetInstance(context.InstanceID);
-            IList<Node> nodes = WorkflowService.NodeService.Query(instance.InstanceID);
+            IList<Node> nodes = AbsWorkflowService.NodeService.Query(instance.InstanceID);
             Node current = nodes.FirstOrDefault(e => e.NID == context.NodeID);
             Node to = nodes.FirstOrDefault(e => e.ID == transition.Destination);
             this.Invoke(transition, new ExecutingContext
@@ -61,7 +61,7 @@ namespace Smartflow.Core.Components
             {
                 string instanceID = context.InstanceID;
                 Node to = executeContext.To;
-                WorkflowService.InstanceService.Jump(selectTransition.Origin, selectTransition.Destination, instanceID, new WorkflowProcess()
+                AbsWorkflowService.InstanceService.Jump(selectTransition.Origin, selectTransition.Destination, instanceID, new WorkflowProcess()
                 {
                     RelationshipID = executeContext.From.NID,
                     CreateTime = DateTime.Now,
@@ -72,16 +72,16 @@ namespace Smartflow.Core.Components
                     InstanceID = executeContext.InstanceID,
                     NodeType = executeContext.From.NodeType,
                     Direction = WorkflowOpertaion.Go
-                }, WorkflowService.ProcessService);
-
-                WorkflowService.Actions.ForEach(pluin => pluin.ActionExecute(executeContext));
+                }, AbsWorkflowService.ProcessService);
+                
+                base.DoPluginAction(executeContext);
                 if (to.NodeType == WorkflowNodeCategory.End)
                 {
-                    WorkflowService.InstanceService.Transfer(WorkflowInstanceState.End, instanceID);
+                    AbsWorkflowService.InstanceService.Transfer(WorkflowInstanceState.End, instanceID);
                 }
                 else if (to.NodeType == WorkflowNodeCategory.Decision)
                 {
-                    Transition transition = WorkflowService.NodeService.GetTransition(to);
+                    Transition transition = base.AbsWorkflowService.NodeService.GetTransition(to);
                     if (transition == null) return;
                     Next(new WorkflowJumpContext()
                     {
