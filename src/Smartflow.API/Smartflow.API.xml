@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Smartflow.API</name>
+    </assembly>
+    <members>
+        <member name="M:Smartflow.API.Controllers.SMFController.Start(Smartflow.Abstraction.Body.BridgeBody)">
+            <summary>
+            启动
+            </summary>
+        </member>
+        <member name="M:Smartflow.API.Controllers.SMFController.Next(Smartflow.Abstraction.Body.PostContextBody)">
+            <summary>
+            向下一步流转
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="M:Smartflow.API.Controllers.SMFController.Back(Smartflow.Abstraction.Body.PostContextBody)">
+            <summary>
+            原路退回
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="M:Smartflow.API.Controllers.SMFController.Sender(Smartflow.Abstraction.Body.PostContextBody)">
+            <summary>
+            退回到发起者
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="M:Smartflow.API.Controllers.SMFController.Veto(Smartflow.Abstraction.Body.PostContextBody)">
+            <summary>
+            否决
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="M:Smartflow.API.Controllers.SMFController.Reboot(System.String,System.String,System.String)">
+            <summary>
+            重新发起流程
+            </summary>
+            <param name="instanceID">实例ID</param>
+            <param name="categoryCode">类别编码</param>
+            <param name="id">业务ID</param>
+        </member>
+        <member name="M:Smartflow.API.Controllers.SMFController.GetNode(System.String,System.String)">
+            <summary>
+            获取当前节点信息
+            </summary>
+            <param name="instanceID">实例ID</param>
+            <param name="actorID">参与人ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:Smartflow.API.Controllers.SMFController.GetCurrent(Smartflow.Core.WorkflowInstance,System.String)">
+            <summary>
+            获取当前节点
+            </summary>
+            <param name="instance"></param>
+            <param name="actorID"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Smartflow.API.Controllers.SMFController.Kill(System.String,System.String,System.String)">
+            <summary>
+            跳转
+            </summary>
+        </member>
+        <member name="M:Smartflow.API.Controllers.SMFController.GetActorByNext(System.String,System.String)">
+            <summary>
+             获取参与者信息
+            </summary>
+        </member>
+        <member name="M:Smartflow.API.Controllers.SMFController.GetNodeTypeByNext(System.String,System.String)">
+            <summary>
+             获取节点类型
+            </summary>
+        </member>
+        <member name="M:Smartflow.API.Controllers.SMFController.GetCurrentNodeActor(System.String,System.String)">
+            <summary>
+             获取参与者信息
+            </summary>
+        </member>
+    </members>
+</doc>
