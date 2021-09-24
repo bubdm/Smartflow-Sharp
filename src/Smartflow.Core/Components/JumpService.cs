@@ -7,7 +7,6 @@ namespace Smartflow.Core.Components
 {
     public class JumpService
     {
-       
         protected AbstractWorkflow AbsWorkflowService
         {
             get;
