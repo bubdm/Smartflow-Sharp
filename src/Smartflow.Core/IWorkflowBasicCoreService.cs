@@ -20,13 +20,13 @@ namespace Smartflow.Core
         /// 抽象工作流的服务
         /// </summary>
         AbstractWorkflow AbsWorkflowService { get; }
-       
+
         /// <summary>
         ///  鉴定流转人是否拥有节点的流转权限
         /// </summary>
         /// <param name="node">当前节点</param>
         /// <returns>true|false</returns>
-        Boolean Authentication(Node node);
+        bool Authentication(Node node);
 
         /// <summary>
         ///  执行自定义动作

@@ -11,6 +11,6 @@ namespace Smartflow.Core
         /// 检查是否授权
         /// </summary>
         /// <param name="node"></param>
-        Boolean Authentication(Node node);
+        bool Authentication(Node node);
     }
 }
